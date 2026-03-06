@@ -2,6 +2,7 @@ import api from "./api";
 
 export const authService = {
   createSession: (idToken) => api.post("/auth/session", { idToken }),
+  refreshToken: () => api.post("/auth/refresh-token"),
   getMe: () => api.get("/auth/me"),
   logout: () => api.post("/auth/logout"),
 };
@@ -82,7 +83,6 @@ export const adminService = {
   deleteUser: (id) => api.delete(`/admin/users/${id}`),
   createVerifier: (data) => api.post("/admin/verifier", data),
   getReports: (params) => api.get("/admin/reports", { params }),
-  // Contact queries
   getContacts: (params) => api.get("/admin/contacts", { params }),
   updateContactStatus: (id, data) =>
     api.put(`/admin/contacts/${id}/status`, data),

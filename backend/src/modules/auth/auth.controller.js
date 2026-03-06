@@ -25,6 +25,17 @@ const createSession = asyncHandler(async (req, res) => {
 
   const { uid, email, name, email_verified } = decodedToken;
 
+  // Check sign-in provider
+  const signInProvider = decodedToken.firebase?.sign_in_provider || "password";
+  const isGoogleLogin = signInProvider === "google.com";
+
+  // Block unverified email for email/password signups (not Google)
+  if (!isGoogleLogin && !email_verified) {
+    throw ApiError.forbidden(
+      "Please verify your email before logging in. Check your inbox for the verification link.",
+    );
+  }
+
   // Find or create user
   let user = await User.findOne({ email });
 
@@ -95,6 +106,43 @@ const createSession = asyncHandler(async (req, res) => {
 });
 
 /**
+ * POST /api/auth/refresh-token
+ * Generate a new JWT with current user role from DB.
+ * Used after role changes (e.g., seller registration).
+ */
+const refreshToken = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id);
+  if (!user) throw ApiError.notFound("User not found");
+
+  const token = signToken({
+    id: user._id.toString(),
+    email: user.email,
+    role: user.role,
+  });
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  res.json({
+    success: true,
+    data: {
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        isSeller: user.isSeller,
+      },
+    },
+  });
+});
+
+/**
  * GET /api/auth/me
  * Get current authenticated user profile.
  */
@@ -130,4 +178,4 @@ const logout = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { createSession, getMe, logout };
+module.exports = { createSession, refreshToken, getMe, logout };

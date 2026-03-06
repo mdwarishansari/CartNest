@@ -66,7 +66,8 @@ const App = () => {
               <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
 
               {/* Seller */}
-              <Route path="/seller/signup" element={<ProtectedRoute><SellerSignup /></ProtectedRoute>} />
+              <Route path="/seller/register" element={<SellerSignup />} />
+              <Route path="/seller/signup" element={<SellerSignup />} />
               <Route path="/seller/dashboard" element={<ProtectedRoute roles={['seller', 'admin']}><SellerDashboard /></ProtectedRoute>} />
 
               {/* Verifier */}

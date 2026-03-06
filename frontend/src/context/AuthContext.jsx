@@ -4,7 +4,7 @@ import {
   onAuthStateChanged,
   signOut as firebaseSignOut,
 } from '../config/firebase';
-import { authService } from '../services';
+import { authService, sellerService } from '../services';
 
 const AuthContext = createContext(null);
 
@@ -18,20 +18,46 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // On mount — check for existing session
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          // Get ID token and create backend session
           const idToken = await firebaseUser.getIdToken();
           const res = await authService.createSession(idToken);
           const { token, user: appUser } = res.data;
 
           localStorage.setItem('token', token);
-          setUser(appUser);
+          let currentUser = appUser;
+
+          // Check for pending seller registration (saved from seller signup page)
+          const pendingSeller = localStorage.getItem('pendingSellerRegistration');
+          if (pendingSeller && currentUser.role === 'customer' && !currentUser.isSeller) {
+            try {
+              const sellerData = JSON.parse(pendingSeller);
+              await sellerService.register(sellerData);
+              localStorage.removeItem('pendingSellerRegistration');
+
+              // Refresh JWT token to get updated role
+              const refreshRes = await authService.refreshToken();
+              const { token: newToken, user: updatedUser } = refreshRes.data;
+              localStorage.setItem('token', newToken);
+              currentUser = updatedUser;
+            } catch (sellerErr) {
+              console.error('Auto seller registration failed:', sellerErr);
+              // If it failed because user already registered, clear pending data
+              if (sellerErr.status === 409) {
+                localStorage.removeItem('pendingSellerRegistration');
+              }
+            }
+          }
+
+          setUser(currentUser);
         } catch (err) {
           console.error('Session creation failed:', err);
+          // If email not verified, sign out from Firebase
+          if (err.status === 403) {
+            await firebaseSignOut(auth);
+          }
           setUser(null);
           localStorage.removeItem('token');
         }
@@ -45,17 +71,24 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
-  // Refresh user data from backend
   const refreshUser = async () => {
     try {
-      const res = await authService.getMe();
-      setUser(res.data.user);
+      // Refresh both token and user data
+      const refreshRes = await authService.refreshToken();
+      const { token, user: updatedUser } = refreshRes.data;
+      localStorage.setItem('token', token);
+      setUser(updatedUser);
     } catch {
-      setUser(null);
+      // Fallback to getMe if refreshToken fails
+      try {
+        const res = await authService.getMe();
+        setUser(res.data.user);
+      } catch {
+        setUser(null);
+      }
     }
   };
 
-  // Logout
   const logout = async () => {
     try {
       await firebaseSignOut(auth);
@@ -75,7 +108,7 @@ export const AuthProvider = ({ children }) => {
     refreshUser,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
-    isSeller: user?.role === 'seller' || user?.isSeller,
+    isSeller: user?.role === 'seller',
     isVerifier: user?.role === 'verifier',
   };
 

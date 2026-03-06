@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, Eye, EyeOff, ArrowRight, UserPlus } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
   auth,
@@ -62,9 +62,8 @@ const Signup = () => {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
-            className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-purple-200"
           >
-            <UserPlus className="w-8 h-8 text-white" />
+            <img src="/logo.png" alt="CartNest" className="w-16 h-16 rounded-2xl object-contain mx-auto mb-5 shadow-lg shadow-purple-200" />
           </motion.div>
           <h1 className="text-3xl font-extrabold gradient-text mb-2">Create Account</h1>
           <p className="text-gray-500 text-sm">Join CartNest to start shopping</p>
@@ -139,11 +138,9 @@ const Signup = () => {
           </button>
 
           {/* Footer */}
-          <div className="mt-7 space-y-3 text-center">
+          <div className="mt-7 space-y-2 text-center">
             <p className="text-sm text-gray-500">Already have an account? <Link to="/auth/login" className="text-indigo-600 font-semibold hover:underline">Sign In</Link></p>
-            <div className="border-t border-gray-100 pt-3">
-              <p className="text-sm text-gray-400">Want to sell? <Link to="/seller/signup" className="text-purple-600 font-semibold hover:underline">Register as Seller</Link></p>
-            </div>
+            <p className="text-xs text-gray-400">Want to sell? <Link to="/seller/register" className="text-gray-500 hover:underline">Register as Seller</Link></p>
           </div>
         </div>
       </motion.div>

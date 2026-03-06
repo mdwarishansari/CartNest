@@ -226,6 +226,23 @@ const deleteUser = asyncHandler(async (req, res) => {
   if (user.role === "admin")
     throw ApiError.forbidden("Cannot delete admin user");
 
+  // Delete from Firebase if firebaseUid exists
+  if (user.firebaseUid) {
+    try {
+      await admin.auth().deleteUser(user.firebaseUid);
+    } catch (fbErr) {
+      console.warn("⚠️  Firebase delete failed:", fbErr.message);
+    }
+  } else if (user.email) {
+    // Try to find by email
+    try {
+      const fbUser = await admin.auth().getUserByEmail(user.email);
+      await admin.auth().deleteUser(fbUser.uid);
+    } catch (fbErr) {
+      // User may not exist in Firebase, that's ok
+    }
+  }
+
   await User.findByIdAndDelete(req.params.id);
 
   res.json({ success: true, message: "User deleted" });

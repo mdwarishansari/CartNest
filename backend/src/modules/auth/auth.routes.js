@@ -1,11 +1,19 @@
 const router = require("express").Router();
-const { createSession, getMe, logout } = require("./auth.controller");
+const {
+  createSession,
+  refreshToken,
+  getMe,
+  logout,
+} = require("./auth.controller");
 const { sessionValidator } = require("./auth.validator");
 const validate = require("../../middleware/validate");
 const authenticate = require("../../middleware/authenticate");
 
 // POST /api/auth/session — Verify Firebase token, create app JWT
 router.post("/session", sessionValidator, validate, createSession);
+
+// POST /api/auth/refresh-token — Refresh JWT with current DB role
+router.post("/refresh-token", authenticate, refreshToken);
 
 // GET /api/auth/me — Get current user (requires auth)
 router.get("/me", authenticate, getMe);

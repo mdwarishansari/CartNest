@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCart, Search, Menu, X, User, LogOut, ChevronDown, LayoutDashboard, Shield, Store, ClipboardCheck } from 'lucide-react';
+import { ShoppingCart, Search, Menu, X, User, LogOut, ChevronDown, Shield, Store, ClipboardCheck, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
@@ -37,8 +37,8 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-md">CN</div>
+          <Link to="/" className="flex items-center gap-2.5 shrink-0">
+            <img src="/logo.png" alt="CartNest" className="w-9 h-9 rounded-xl object-contain" />
             <span className="text-lg font-extrabold text-gray-900 hidden sm:block">CartNest</span>
           </Link>
 
@@ -59,6 +59,13 @@ const Navbar = () => {
 
           {/* Right */}
           <div className="flex items-center gap-2">
+            {/* Subtle seller register link — only show if user is NOT a seller/admin/verifier */}
+            {(!user || (user.role === 'customer' && !user.isSeller)) && (
+              <Link to="/seller/register" className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 transition-colors">
+                <Store className="w-3.5 h-3.5" /> Sell on CartNest
+              </Link>
+            )}
+
             {/* Cart */}
             <Link to="/cart" className="relative p-2.5 rounded-xl hover:bg-gray-100 transition-colors">
               <ShoppingCart className="w-5 h-5 text-gray-600" />
@@ -103,31 +110,47 @@ const Navbar = () => {
                           <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-bold uppercase rounded-md bg-indigo-100 text-indigo-600">{user.role}</span>
                         </div>
                         <div className="py-1">
-                          <Link to="/account" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                            <User className="w-4 h-4 text-gray-400" /> My Account
-                          </Link>
-                          <Link to="/orders" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                            <ShoppingCart className="w-4 h-4 text-gray-400" /> My Orders
-                          </Link>
+                          {/* Customer items */}
+                          {(user.role === 'customer' || user.role === 'seller') && (
+                            <>
+                              <Link to="/account" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                <User className="w-4 h-4 text-gray-400" /> My Account
+                              </Link>
+                              <Link to="/orders" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                <ShoppingBag className="w-4 h-4 text-gray-400" /> My Orders
+                              </Link>
+                            </>
+                          )}
+
+                          {/* Seller-only */}
                           {isSeller && (
-                            <Link to="/seller/dashboard" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                              <Store className="w-4 h-4 text-gray-400" /> Seller Dashboard
+                            <Link to="/seller/dashboard" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-purple-600 hover:bg-purple-50 transition-colors">
+                              <Store className="w-4 h-4" /> Seller Dashboard
                             </Link>
                           )}
-                          {isVerifier && (
-                            <Link to="/verifier" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-teal-600 hover:bg-teal-50 transition-colors">
-                              <ClipboardCheck className="w-4 h-4" /> Verifier Panel
-                            </Link>
+
+                          {/* Verifier-only */}
+                          {isVerifier && !isAdmin && (
+                            <>
+                              <Link to="/account" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                <User className="w-4 h-4 text-gray-400" /> My Account
+                              </Link>
+                              <Link to="/verifier" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-teal-600 hover:bg-teal-50 transition-colors">
+                                <ClipboardCheck className="w-4 h-4" /> Verifier Panel
+                              </Link>
+                            </>
                           )}
+
+                          {/* Admin-only */}
                           {isAdmin && (
-                            <Link to="/admin" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-indigo-600 hover:bg-indigo-50 transition-colors">
-                              <Shield className="w-4 h-4" /> Admin Panel
-                            </Link>
-                          )}
-                          {!isSeller && !isAdmin && (
-                            <Link to="/seller/signup" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-purple-600 hover:bg-purple-50 transition-colors">
-                              <LayoutDashboard className="w-4 h-4" /> Become a Seller
-                            </Link>
+                            <>
+                              <Link to="/account" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                <User className="w-4 h-4 text-gray-400" /> My Account
+                              </Link>
+                              <Link to="/admin" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-indigo-600 hover:bg-indigo-50 transition-colors">
+                                <Shield className="w-4 h-4" /> Admin Panel
+                              </Link>
+                            </>
                           )}
                         </div>
                         <div className="border-t border-gray-100 pt-1">
@@ -174,6 +197,11 @@ const Navbar = () => {
                     className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-indigo-500 outline-none transition-all"
                   />
                 </form>
+              )}
+              {(!user || (user.role === 'customer' && !user.isSeller)) && (
+                <Link to="/seller/register" onClick={() => setOpen(false)} className="block text-center py-2 text-xs text-gray-500 hover:text-gray-700">
+                  Sell on CartNest →
+                </Link>
               )}
               {!user && (
                 <div className="flex gap-2 pt-2">
