@@ -31,9 +31,14 @@ const startServer = async () => {
 
   // Start Express
   app.listen(PORT, () => {
+    const baseUrl =
+      process.env.NODE_ENV === "production"
+        ? process.env.BACKEND_URL
+        : `http://localhost:${PORT}`;
+
     console.log(`\n🚀 CartNest API running on port ${PORT}`);
     console.log(`   Environment: ${process.env.NODE_ENV || "development"}`);
-    console.log(`   Health: http://localhost:${PORT}/api/health\n`);
+    console.log(`   Health: ${baseUrl}/api/health\n`);
   });
 };
 
