@@ -18,7 +18,7 @@ const connectRedis = () => {
           );
           return null; // stop retrying
         }
-        return Math.min(times * 200, 2000);
+        return Math.min(times * 500, 2000);
       },
     });
 
