@@ -1,6 +1,6 @@
-
-
 # CartNest Backend
+
+Live - https://cartnest-backend.onrender.com
 
 ## Overview
 
@@ -8,15 +8,15 @@ CartNest backend powers a **multi-vendor marketplace platform** where small sell
 
 It provides:
 
-* Authentication via Firebase
-* Product management for sellers
-* Admin verification system
-* Cart and order management
-* Secure Razorpay payments
-* Cloudinary image storage
-* Email notifications via SMTP
-* Redis caching and stock locks
-* RESTful API for frontend
+- Authentication via Firebase
+- Product management for sellers
+- Admin verification system
+- Cart and order management
+- Secure Razorpay payments
+- Cloudinary image storage
+- Email notifications via SMTP
+- Redis caching and stock locks
+- RESTful API for frontend
 
 The backend is built with **Node.js + Express + MongoDB** following modular architecture.
 
@@ -26,16 +26,16 @@ The backend is built with **Node.js + Express + MongoDB** following modular arch
 
 Core technologies used:
 
-* Node.js
-* Express.js
-* MongoDB Atlas
-* Mongoose
-* Firebase Admin SDK
-* Cloudinary
-* Razorpay
-* Redis
-* Nodemailer (SMTP)
-* JWT (optional session token)
+- Node.js
+- Express.js
+- MongoDB Atlas
+- Mongoose
+- Firebase Admin SDK
+- Cloudinary
+- Razorpay
+- Redis
+- Nodemailer (SMTP)
+- JWT (optional session token)
 
 ---
 
@@ -84,8 +84,8 @@ Handled using **Firebase Authentication**.
 
 Supported login methods:
 
-* Email + Password
-* Google Login
+- Email + Password
+- Google Login
 
 Flow:
 
@@ -115,10 +115,10 @@ sales metrics
 
 Sellers can:
 
-* Add products
-* Manage products
-* View orders
-* Update order status
+- Add products
+- Manage products
+- View orders
+- Update order status
 
 ---
 
@@ -156,9 +156,9 @@ seller reference
 
 Cart operations:
 
-* add item
-* update quantity
-* remove item
+- add item
+- update quantity
+- remove item
 
 ---
 
@@ -190,16 +190,16 @@ Order confirmed
 
 To prevent overselling:
 
-* MongoDB atomic updates
-* Redis distributed locks
+- MongoDB atomic updates
+- Redis distributed locks
 
 Example stock update:
 
 ```js
 await Product.findOneAndUpdate(
   { _id: productId, stock: { $gte: qty } },
-  { $inc: { stock: -qty, reserved: qty } }
-)
+  { $inc: { stock: -qty, reserved: qty } },
+);
 ```
 
 ---
@@ -210,10 +210,10 @@ Emails are sent using SMTP.
 
 Used for:
 
-* password reset
-* order confirmation
-* admin notifications
-* contact form replies
+- password reset
+- order confirmation
+- admin notifications
+- contact form replies
 
 SMTP uses **Gmail App Password** for development.
 
@@ -401,11 +401,11 @@ Steps:
 
 # Security Practices
 
-* Sensitive keys stored in `.env`
-* Firebase token verification
-* Razorpay signature verification
-* Cloudinary API secret restricted to backend
-* Input validation for API routes
+- Sensitive keys stored in `.env`
+- Firebase token verification
+- Razorpay signature verification
+- Cloudinary API secret restricted to backend
+- Input validation for API routes
 
 ---
 
@@ -413,11 +413,11 @@ Steps:
 
 Possible upgrades:
 
-* Redis caching layer
-* Background job queue
-* Seller payout automation
-* Advanced analytics dashboard
-* Image optimization pipeline
+- Redis caching layer
+- Background job queue
+- Seller payout automation
+- Advanced analytics dashboard
+- Image optimization pipeline
 
 ---
 

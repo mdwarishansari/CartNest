@@ -1,5 +1,7 @@
 # CartNest Frontend
 
+Live - https://cartnest-shop.vercel.app/
+
 ## Overview
 
 CartNest frontend is a **modern React (Vite) application** for a multi-vendor marketplace where customers can browse products, add items to cart, and securely complete purchases.

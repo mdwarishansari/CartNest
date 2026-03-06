@@ -9,7 +9,13 @@ const { initRazorpay } = require("./config/razorpay");
 const { seedAdmin } = require("./modules/admin/admin.seed");
 
 const PORT = process.env.PORT || 5000;
+process.on("uncaughtException", (err) => {
+  console.error("UNCAUGHT EXCEPTION:", err);
+});
 
+process.on("unhandledRejection", (err) => {
+  console.error("UNHANDLED REJECTION:", err);
+});
 const startServer = async () => {
   // Connect to MongoDB
   await connectDB();
