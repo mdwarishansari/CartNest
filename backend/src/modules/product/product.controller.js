@@ -35,7 +35,18 @@ const getProducts = asyncHandler(async (req, res) => {
     delete filter.verified;
   }
 
-  if (category) filter.categoryId = category;
+  if (category) {
+    // Support both ObjectId and slug for category filtering
+    if (category.match(/^[0-9a-fA-F]{24}$/)) {
+      filter.categoryId = category;
+    } else {
+      // Try to find by slug
+      const Category = require("../category/category.model");
+      const cat = await Category.findOne({ slug: category });
+      if (cat) filter.categoryId = cat._id;
+    }
+  }
+
   if (minPrice || maxPrice) {
     filter.price = {};
     if (minPrice) filter.price.$gte = Number(minPrice);
@@ -47,8 +58,15 @@ const getProducts = asyncHandler(async (req, res) => {
     filter.$text = { $search: search };
   }
 
+  // When using $text search, MongoDB requires textScore sort unless explicit sort is given
+  // If sort is the default and we have text search, use textScore for relevance
+  let sortOption = sort;
+  if (search && sort === "-createdAt") {
+    sortOption = { score: { $meta: "textScore" }, createdAt: -1 };
+  }
+
   const products = await Product.find(filter)
-    .sort(sort)
+    .sort(sortOption)
     .skip((Number(page) - 1) * Number(limit))
     .limit(Number(limit))
     .populate("categoryId", "name slug")

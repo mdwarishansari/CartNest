@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Package, ShoppingBag, DollarSign, BarChart3, Plus, Trash2, Store, Edit, X, Upload, Save, CheckCircle, Clock, XCircle, Calendar } from 'lucide-react';
+import { Package, ShoppingBag, DollarSign, BarChart3, Plus, Trash2, Store, Edit, X, Upload, Save, CheckCircle, Clock, XCircle, Calendar, User, TrendingUp, Percent, Camera, Mail, Phone } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { sellerService, categoryService } from '../../services';
-import { uploadMultipleImages } from '../../services/cloudinary';
+import { sellerService, categoryService, userService } from '../../services';
+import { uploadMultipleImages, uploadImage } from '../../services/cloudinary';
 import { useAuth } from '../../context/AuthContext';
 import { PageSpinner } from '../../components/ui/Spinner';
 
@@ -15,7 +15,7 @@ const verBadge = {
   rejected: { cls: 'bg-red-100 text-red-700', icon: XCircle, label: 'Rejected' },
 };
 
-const StatCard = ({ icon: Icon, label, value, color }) => (
+const StatCard = ({ icon: Icon, label, value, color, sub }) => (
   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
     className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 hover:shadow-md transition-all">
     <div className="flex items-center gap-4">
@@ -25,13 +25,14 @@ const StatCard = ({ icon: Icon, label, value, color }) => (
       <div>
         <p className="text-2xl font-bold text-gray-900">{value}</p>
         <p className="text-xs text-gray-500 font-medium">{label}</p>
+        {sub && <p className="text-[10px] text-gray-400 mt-0.5">{sub}</p>}
       </div>
     </div>
   </motion.div>
 );
 
 const SellerDashboard = () => {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [dashboard, setDashboard] = useState(null);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -45,10 +46,23 @@ const SellerDashboard = () => {
   const [imageFiles, setImageFiles] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
-  // Edit profile
+  // Edit product
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [editImageFiles, setEditImageFiles] = useState([]);
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  // Edit shop profile
   const [editProfile, setEditProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({ shopName: '', description: '' });
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
   const [savingProfile, setSavingProfile] = useState(false);
+
+  // Account profile
+  const [accountName, setAccountName] = useState('');
+  const [accountPhone, setAccountPhone] = useState('');
+  const [savingAccount, setSavingAccount] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -62,6 +76,8 @@ const SellerDashboard = () => {
       if (dashRes.data.profile) {
         setProfileForm({ shopName: dashRes.data.profile.shopName || '', description: dashRes.data.profile.description || '' });
       }
+      setAccountName(user?.name || '');
+      setAccountPhone(user?.phone || '');
     }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
@@ -108,16 +124,81 @@ const SellerDashboard = () => {
     } catch (err) { toast.error(err.message); }
   };
 
+  const openEditProduct = (prod) => {
+    setEditingProduct(prod);
+    setEditForm({
+      title: prod.title || '',
+      description: prod.description || '',
+      price: prod.price || '',
+      mrp: prod.mrp || '',
+      categoryId: prod.categoryId?._id || prod.categoryId || '',
+      stock: prod.stock || 0,
+      tags: (prod.tags || []).join(', '),
+      status: prod.status || 'active',
+    });
+    setEditImageFiles([]);
+  };
+
+  const handleEditProduct = async (e) => {
+    e.preventDefault();
+    setSavingEdit(true);
+    try {
+      let newImages = [];
+      if (editImageFiles.length > 0) {
+        newImages = await uploadMultipleImages(editImageFiles, 'product');
+      }
+      const payload = {
+        title: editForm.title,
+        description: editForm.description,
+        price: Number(editForm.price),
+        mrp: Number(editForm.mrp) || Number(editForm.price),
+        categoryId: editForm.categoryId || undefined,
+        stock: Number(editForm.stock),
+        tags: editForm.tags ? editForm.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
+        status: editForm.status,
+      };
+      // If new images uploaded, merge with existing
+      if (newImages.length > 0) {
+        payload.images = [...(editingProduct.images || []), ...newImages];
+      }
+      const res = await sellerService.updateProduct(editingProduct._id, payload);
+      setProducts(products.map((p) => p._id === editingProduct._id ? res.data.product : p));
+      setEditingProduct(null);
+      toast.success('Product updated successfully');
+    } catch (err) { toast.error(err.message || 'Failed to update product'); }
+    finally { setSavingEdit(false); }
+  };
+
   const handleSaveProfile = async () => {
     setSavingProfile(true);
     try {
-      await sellerService.updateProfile(profileForm);
-      toast.success('Profile updated');
+      let logoData = undefined;
+      if (logoFile) {
+        const uploaded = await uploadImage(logoFile, 'seller', profileForm.shopName);
+        logoData = { public_id: uploaded.public_id, url: uploaded.url };
+      }
+      await sellerService.updateProfile({
+        ...profileForm,
+        ...(logoData ? { logo: logoData } : {}),
+      });
+      toast.success('Shop profile updated');
       setEditProfile(false);
+      setLogoFile(null);
+      setLogoPreview(null);
       const res = await sellerService.getDashboard();
       setDashboard(res.data);
     } catch (err) { toast.error(err.message); }
     finally { setSavingProfile(false); }
+  };
+
+  const handleSaveAccount = async () => {
+    setSavingAccount(true);
+    try {
+      await userService.updateProfile({ name: accountName, phone: accountPhone });
+      await refreshUser();
+      toast.success('Account details updated');
+    } catch (err) { toast.error(err.message); }
+    finally { setSavingAccount(false); }
   };
 
   const handleUpdateOrderStatus = async (orderId, status) => {
@@ -132,11 +213,14 @@ const SellerDashboard = () => {
 
   const stats = dashboard?.stats || {};
   const profile = dashboard?.profile || {};
+  const commissionRate = 0.10;
+  const netSales = Math.round((stats.totalSales || 0) * (1 - commissionRate));
   const tabs = [
     { key: 'overview', label: 'Overview', icon: BarChart3 },
     { key: 'products', label: 'Products', icon: Package },
     { key: 'orders', label: 'Orders', icon: ShoppingBag },
-    { key: 'account', label: 'Account', icon: Store },
+    { key: 'shop', label: 'Shop', icon: Store },
+    { key: 'account', label: 'Account', icon: User },
   ];
 
   return (
@@ -145,7 +229,7 @@ const SellerDashboard = () => {
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
           {profile.logo?.url ? (
-            <img src={profile.logo.url} alt="" className="w-14 h-14 rounded-2xl object-cover border-2 border-gray-200" />
+            <img src={profile.logo.url} alt="" className="w-14 h-14 rounded-2xl object-cover border-2 border-gray-200 shadow-sm" />
           ) : (
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-lg font-bold shadow-md">
               {profile.shopName?.charAt(0) || 'S'}
@@ -178,8 +262,32 @@ const SellerDashboard = () => {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard icon={Package} label="Products" value={stats.totalProducts || 0} color="bg-indigo-500" />
             <StatCard icon={ShoppingBag} label="Orders" value={stats.totalOrders || 0} color="bg-blue-500" />
-            <StatCard icon={DollarSign} label="Total Sales" value={`₹${(stats.totalSales || 0).toLocaleString('en-IN')}`} color="bg-green-500" />
-            <StatCard icon={BarChart3} label="Balance" value={`₹${(stats.currentBalance || 0).toLocaleString('en-IN')}`} color="bg-amber-500" />
+            <StatCard icon={TrendingUp} label="Net Earnings" value={`₹${(stats.netEarnings || netSales).toLocaleString('en-IN')}`} color="bg-green-500" sub="After 10% commission" />
+            <StatCard icon={DollarSign} label="Balance" value={`₹${(stats.currentBalance || 0).toLocaleString('en-IN')}`} color="bg-amber-500" sub="Pending payout" />
+          </div>
+
+          {/* Commission Info */}
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl border border-indigo-100 p-5">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
+                <Percent className="w-4 h-4 text-indigo-600" />
+              </div>
+              <h4 className="font-semibold text-sm text-gray-900">Earnings Breakdown</h4>
+            </div>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div className="bg-white/60 rounded-xl p-3">
+                <p className="text-lg font-bold text-gray-900">₹{(stats.totalSales || 0).toLocaleString('en-IN')}</p>
+                <p className="text-[10px] text-gray-500 font-medium">Gross Sales</p>
+              </div>
+              <div className="bg-white/60 rounded-xl p-3">
+                <p className="text-lg font-bold text-red-500">-₹{(stats.commission || Math.round((stats.totalSales || 0) * commissionRate)).toLocaleString('en-IN')}</p>
+                <p className="text-[10px] text-gray-500 font-medium">Platform Fee (10%)</p>
+              </div>
+              <div className="bg-white/60 rounded-xl p-3">
+                <p className="text-lg font-bold text-green-600">₹{(stats.netEarnings || netSales).toLocaleString('en-IN')}</p>
+                <p className="text-[10px] text-gray-500 font-medium">Your Earnings</p>
+              </div>
+            </div>
           </div>
 
           {/* Recent Orders */}
@@ -234,9 +342,14 @@ const SellerDashboard = () => {
                     <p className="text-xs text-red-500 mt-1">Reason: {prod.verificationNotes}</p>
                   )}
                 </div>
-                <button onClick={() => handleDelete(prod._id)} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all shrink-0">
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                <div className="flex gap-1 shrink-0">
+                  <button onClick={() => openEditProduct(prod)} className="p-2 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all" title="Edit">
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => handleDelete(prod._id)} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all" title="Delete">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </motion.div>
             );
           })}
@@ -262,7 +375,10 @@ const SellerDashboard = () => {
                 <div className="flex items-center gap-2">
                   <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded-md ${order.paymentStatus === 'paid' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>{order.paymentStatus}</span>
                   <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded-md ${order.orderStatus === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>{order.orderStatus}</span>
-                  <span className="font-bold text-gray-900">₹{order.totalAmount?.toLocaleString('en-IN')}</span>
+                  <div className="text-right">
+                    <span className="font-bold text-gray-900 block">₹{order.totalAmount?.toLocaleString('en-IN')}</span>
+                    <span className="text-[10px] text-green-600">You earn: ₹{Math.round(order.totalAmount * 0.9)?.toLocaleString('en-IN')}</span>
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-wrap">
@@ -280,20 +396,39 @@ const SellerDashboard = () => {
         </div>
       )}
 
-      {/* ── Account ── */}
-      {tab === 'account' && (
+      {/* ── Shop Profile ── */}
+      {tab === 'shop' && (
         <div className="animate-fade-in">
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-8">
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2"><Store className="w-5 h-5 text-indigo-500" />Shop Profile</h3>
-              <button onClick={() => setEditProfile(!editProfile)}
+              <button onClick={() => { setEditProfile(!editProfile); setLogoFile(null); setLogoPreview(null); }}
                 className="px-4 py-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all flex items-center gap-1.5">
                 <Edit className="w-4 h-4" />{editProfile ? 'Cancel' : 'Edit'}
               </button>
             </div>
 
             {editProfile ? (
-              <div className="space-y-4">
+              <div className="space-y-5">
+                {/* Logo upload */}
+                <div className="flex flex-col items-center">
+                  <label className="relative w-24 h-24 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/50 transition-all group">
+                    {logoPreview ? (
+                      <img src={logoPreview} alt="Logo" className="w-full h-full object-cover" />
+                    ) : profile.logo?.url ? (
+                      <img src={profile.logo.url} alt="Logo" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="flex flex-col items-center text-gray-400 group-hover:text-indigo-500 transition-colors">
+                        <Camera className="w-6 h-6 mb-0.5" /><span className="text-[10px] font-medium">Change</span>
+                      </div>
+                    )}
+                    <input type="file" accept="image/*" onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) { setLogoFile(file); setLogoPreview(URL.createObjectURL(file)); }
+                    }} className="absolute inset-0 opacity-0 cursor-pointer" />
+                  </label>
+                  <p className="text-xs text-gray-400 mt-1.5">Click to change shop logo</p>
+                </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Shop Name</label>
                   <input value={profileForm.shopName} onChange={(e) => setProfileForm({ ...profileForm, shopName: e.target.value })} className={inputCls} />
@@ -309,30 +444,66 @@ const SellerDashboard = () => {
                 </button>
               </div>
             ) : (
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
+              <div className="space-y-5">
+                <div className="flex items-center gap-5">
                   {profile.logo?.url ? (
-                    <img src={profile.logo.url} alt="" className="w-20 h-20 rounded-2xl object-cover border-2 border-gray-200" />
+                    <img src={profile.logo.url} alt="" className="w-24 h-24 rounded-2xl object-cover border-2 border-gray-200 shadow-sm" />
                   ) : (
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-2xl font-bold">
+                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
                       {profile.shopName?.charAt(0) || 'S'}
                     </div>
                   )}
                   <div>
                     <p className="text-xl font-bold text-gray-900">{profile.shopName}</p>
-                    <p className="text-sm text-gray-500">/{profile.shopSlug}</p>
+                    <p className="text-sm text-gray-400 mt-0.5">/{profile.shopSlug}</p>
+                    <p className="text-xs text-gray-500 mt-1 flex items-center gap-1"><Mail className="w-3 h-3" />{profile.userEmail}</p>
                   </div>
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-700 mb-1">Description</p>
-                  <p className="text-sm text-gray-500 leading-relaxed">{profile.description || 'No description'}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-700 mb-1">Email</p>
-                  <p className="text-sm text-gray-500">{profile.userEmail}</p>
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                  <p className="text-sm font-semibold text-gray-700 mb-1">Shop Description</p>
+                  <p className="text-sm text-gray-500 leading-relaxed">{profile.description || 'No description added yet. Click Edit to add one.'}</p>
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Account ── */}
+      {tab === 'account' && (
+        <div className="animate-fade-in space-y-6">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
+                <User className="w-5 h-5 text-indigo-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 text-lg">Personal Details</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Name</label>
+                <input value={accountName} onChange={(e) => setAccountName(e.target.value)} className={inputCls} placeholder="Your name" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Phone</label>
+                <input value={accountPhone} onChange={(e) => setAccountPhone(e.target.value)} className={inputCls} placeholder="+91 XXXXX XXXXX" />
+              </div>
+            </div>
+            <div className="mb-5">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+              <p className="px-4 py-3 text-sm text-gray-500 bg-gray-50 rounded-xl border border-gray-200">{user?.email}</p>
+            </div>
+            <div className="mb-5">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Role</label>
+              <p className="px-4 py-3 text-sm bg-gray-50 rounded-xl border border-gray-200">
+                <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-bold rounded-md uppercase">{user?.role}</span>
+              </p>
+            </div>
+            <button onClick={handleSaveAccount} disabled={savingAccount}
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-60">
+              {savingAccount ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
+              Save Changes
+            </button>
           </div>
         </div>
       )}
@@ -397,6 +568,94 @@ const SellerDashboard = () => {
                     {submitting ? 'Creating...' : 'Create Product'}
                   </button>
                   <button type="button" onClick={() => setShowAdd(false)}
+                    className="px-6 py-3 border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Edit Product Modal ── */}
+      <AnimatePresence>
+        {editingProduct && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between p-5 border-b border-gray-100">
+                <h2 className="text-xl font-bold text-gray-900">Edit Product</h2>
+                <button onClick={() => setEditingProduct(null)} className="p-2 hover:bg-gray-100 rounded-xl transition-colors"><X className="w-5 h-5" /></button>
+              </div>
+              <form onSubmit={handleEditProduct} className="p-5 space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Title</label>
+                  <input value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })} className={inputCls} />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                  <textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} className={`${inputCls} min-h-[80px] resize-y`} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Price (₹)</label>
+                    <input type="number" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} className={inputCls} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">MRP (₹)</label>
+                    <input type="number" value={editForm.mrp} onChange={(e) => setEditForm({ ...editForm, mrp: e.target.value })} className={inputCls} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+                    <select value={editForm.categoryId} onChange={(e) => setEditForm({ ...editForm, categoryId: e.target.value })} className={inputCls}>
+                      <option value="">Select</option>
+                      {categories.map((cat) => <option key={cat._id} value={cat._id}>{cat.name}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Stock</label>
+                    <input type="number" value={editForm.stock} onChange={(e) => setEditForm({ ...editForm, stock: e.target.value })} className={inputCls} />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                  <select value={editForm.status} onChange={(e) => setEditForm({ ...editForm, status: e.target.value })} className={inputCls}>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Tags (comma separated)</label>
+                  <input value={editForm.tags} onChange={(e) => setEditForm({ ...editForm, tags: e.target.value })} className={inputCls} />
+                </div>
+                {/* Current images */}
+                {editingProduct.images?.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Current Images</label>
+                    <div className="flex gap-2 flex-wrap">
+                      {editingProduct.images.map((img, i) => (
+                        <img key={i} src={img.url} alt="" className="w-16 h-16 rounded-lg object-cover border border-gray-200" />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Add More Images</label>
+                  <label className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/50 transition-all">
+                    <Upload className="w-5 h-5 text-gray-400" />
+                    <span className="text-sm text-gray-500">{editImageFiles.length > 0 ? `${editImageFiles.length} new file(s)` : 'Add images'}</span>
+                    <input type="file" accept="image/*" multiple onChange={(e) => setEditImageFiles(Array.from(e.target.files))} className="hidden" />
+                  </label>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <button type="submit" disabled={savingEdit}
+                    className="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-60">
+                    {savingEdit ? 'Saving...' : 'Save Changes'}
+                  </button>
+                  <button type="button" onClick={() => setEditingProduct(null)}
                     className="px-6 py-3 border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all">
                     Cancel
                   </button>

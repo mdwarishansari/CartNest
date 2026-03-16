@@ -88,4 +88,6 @@ export const adminService = {
     api.put(`/admin/contacts/${id}/status`, data),
   replyToContact: (id, data) => api.post(`/admin/contacts/${id}/reply`, data),
   deleteContact: (id) => api.delete(`/admin/contacts/${id}`),
+  getSellerEarnings: () => api.get("/admin/seller-earnings"),
+  markPayoutPaid: (sellerId) => api.put(`/admin/seller/${sellerId}/payout`),
 };

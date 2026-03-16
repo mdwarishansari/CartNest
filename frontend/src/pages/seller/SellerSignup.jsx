@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Store, Upload, ArrowRight, CheckCircle, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { Store, Upload, ArrowRight, CheckCircle, Mail, Lock, User, Eye, EyeOff, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
   auth,
@@ -9,6 +9,7 @@ import {
   sendEmailVerification,
 } from '../../config/firebase';
 import { updateProfile } from 'firebase/auth';
+import { uploadImage } from '../../services/cloudinary';
 
 const SellerSignup = () => {
   const navigate = useNavigate();
@@ -38,16 +39,30 @@ const SellerSignup = () => {
     if (!form.shopName.trim()) { toast.error('Shop name is required'); return; }
     setLoading(true);
     try {
-      // 1. Create Firebase user
+      // 1. Upload logo to Cloudinary if provided
+      let logo = null;
+      if (logoFile) {
+        try {
+          const uploaded = await uploadImage(logoFile, 'seller', form.shopName);
+          logo = { public_id: uploaded.public_id, url: uploaded.url };
+        } catch (uploadErr) {
+          console.warn('Logo upload failed, continuing without logo:', uploadErr);
+        }
+      }
+
+      // 2. Create Firebase user
       const { user: fbUser } = await createUserWithEmailAndPassword(auth, form.email, form.password);
       await updateProfile(fbUser, { displayName: form.name });
       await sendEmailVerification(fbUser);
 
-      // 2. Save seller registration data to localStorage so after login it auto-registers
-      localStorage.setItem('pendingSellerRegistration', JSON.stringify({
+      // 3. Save seller registration data to localStorage so after login it auto-registers
+      const pendingData = {
         shopName: form.shopName,
         description: form.description,
-      }));
+      };
+      if (logo) pendingData.logo = logo;
+
+      localStorage.setItem('pendingSellerRegistration', JSON.stringify(pendingData));
 
       toast.success('Account created! Check email for verification then login.', { duration: 5000 });
 
@@ -167,6 +182,13 @@ const SellerSignup = () => {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Shop Description</label>
                 <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className={`${inputCls} min-h-[80px] resize-y`} placeholder="Tell buyers about your shop..." />
               </div>
+
+              {/* Commission notice */}
+              <div className="flex items-start gap-2 p-3 bg-gray-50 rounded-xl text-xs text-gray-400">
+                <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                <span>A 10% platform commission applies on each sale to cover payment processing, hosting, and support services.</span>
+              </div>
+
               <button type="submit" disabled={loading} className="w-full py-3 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-indigo-200 hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-60">
                 {loading ? (
                   <span className="flex items-center justify-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Creating your shop...</span>

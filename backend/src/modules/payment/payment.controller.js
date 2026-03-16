@@ -70,7 +70,8 @@ const verifyPayment = asyncHandler(async (req, res) => {
     });
   }
 
-  // Update seller metrics
+  // Update seller metrics with 10% commission
+  const COMMISSION_RATE = 0.10;
   const sellerAmounts = {};
   for (const item of order.items) {
     const sid = item.sellerId.toString();
@@ -78,11 +79,15 @@ const verifyPayment = asyncHandler(async (req, res) => {
   }
 
   for (const [sellerId, amount] of Object.entries(sellerAmounts)) {
+    const commissionAmount = Math.round(amount * COMMISSION_RATE * 100) / 100;
+    const netAmount = amount - commissionAmount;
     await SellerProfile.findByIdAndUpdate(sellerId, {
       $inc: {
         "metrics.totalSales": amount,
         "metrics.totalOrders": 1,
-        "metrics.currentBalance": amount,
+        "metrics.commission": commissionAmount,
+        "metrics.netEarnings": netAmount,
+        "metrics.currentBalance": netAmount,
       },
     });
   }

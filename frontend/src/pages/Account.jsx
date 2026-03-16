@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, MapPin, Plus, Trash2, Save } from 'lucide-react';
+import { User, MapPin, Plus, Trash2, Save, Shield, Phone, Mail, Home } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { userService } from '../services';
@@ -13,7 +13,7 @@ const Account = () => {
   const [saving, setSaving] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [newAddr, setNewAddr] = useState({ line1: '', line2: '', city: '', state: '', zip: '', country: 'India' });
+  const [newAddr, setNewAddr] = useState({ name: '', phone: '', house: '', city: '', state: '', pincode: '', country: 'India' });
   const [showAddrForm, setShowAddrForm] = useState(false);
 
   useEffect(() => {
@@ -41,12 +41,14 @@ const Account = () => {
   };
 
   const handleAddAddress = async () => {
-    if (!newAddr.line1 || !newAddr.city || !newAddr.state || !newAddr.zip) { toast.error('Fill all required fields'); return; }
+    if (!newAddr.name || !newAddr.phone || !newAddr.house || !newAddr.city || !newAddr.state || !newAddr.pincode) {
+      toast.error('Please fill all required fields'); return;
+    }
     try {
       await userService.addAddress(newAddr);
       const res = await userService.getProfile();
       setProfile(res.data.user);
-      setNewAddr({ line1: '', line2: '', city: '', state: '', zip: '', country: 'India' });
+      setNewAddr({ name: '', phone: '', house: '', city: '', state: '', pincode: '', country: 'India' });
       setShowAddrForm(false);
       toast.success('Address added');
     } catch (err) { toast.error(err.message); }
@@ -55,7 +57,7 @@ const Account = () => {
   const handleDeleteAddress = async (id) => {
     try {
       await userService.deleteAddress(id);
-      setProfile({ ...profile, addresses: profile.addresses.filter((a) => a._id !== id) });
+      setProfile({ ...profile, addressBook: profile.addressBook.filter((a) => a._id !== id) });
       toast.success('Address removed');
     } catch (err) { toast.error(err.message); }
   };
@@ -111,12 +113,34 @@ const Account = () => {
         {showAddrForm && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mb-6 p-5 bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-              <input value={newAddr.line1} onChange={(e) => setNewAddr({ ...newAddr, line1: e.target.value })} className={inputCls} placeholder="Address Line 1 *" />
-              <input value={newAddr.line2} onChange={(e) => setNewAddr({ ...newAddr, line2: e.target.value })} className={inputCls} placeholder="Address Line 2" />
-              <input value={newAddr.city} onChange={(e) => setNewAddr({ ...newAddr, city: e.target.value })} className={inputCls} placeholder="City *" />
-              <input value={newAddr.state} onChange={(e) => setNewAddr({ ...newAddr, state: e.target.value })} className={inputCls} placeholder="State *" />
-              <input value={newAddr.zip} onChange={(e) => setNewAddr({ ...newAddr, zip: e.target.value })} className={inputCls} placeholder="ZIP Code *" />
-              <input value={newAddr.country} onChange={(e) => setNewAddr({ ...newAddr, country: e.target.value })} className={inputCls} placeholder="Country" />
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Full Name *</label>
+                <input value={newAddr.name} onChange={(e) => setNewAddr({ ...newAddr, name: e.target.value })} className={inputCls} placeholder="Recipient name" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Phone *</label>
+                <input value={newAddr.phone} onChange={(e) => setNewAddr({ ...newAddr, phone: e.target.value })} className={inputCls} placeholder="+91 XXXXX XXXXX" />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold text-gray-600 mb-1">House / Street / Area *</label>
+                <input value={newAddr.house} onChange={(e) => setNewAddr({ ...newAddr, house: e.target.value })} className={inputCls} placeholder="123, Main Street, Area" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">City *</label>
+                <input value={newAddr.city} onChange={(e) => setNewAddr({ ...newAddr, city: e.target.value })} className={inputCls} placeholder="City" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">State *</label>
+                <input value={newAddr.state} onChange={(e) => setNewAddr({ ...newAddr, state: e.target.value })} className={inputCls} placeholder="State" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Pincode *</label>
+                <input value={newAddr.pincode} onChange={(e) => setNewAddr({ ...newAddr, pincode: e.target.value })} className={inputCls} placeholder="110001" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Country</label>
+                <input value={newAddr.country} onChange={(e) => setNewAddr({ ...newAddr, country: e.target.value })} className={inputCls} placeholder="India" />
+              </div>
             </div>
             <button onClick={handleAddAddress} className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all">
               <Plus className="w-4 h-4" /> Save Address
@@ -125,12 +149,18 @@ const Account = () => {
         )}
 
         <div className="space-y-3">
-          {profile?.addresses?.length > 0 ? profile.addresses.map((addr) => (
+          {profile?.addressBook?.length > 0 ? profile.addressBook.map((addr) => (
             <div key={addr._id} className="flex items-start justify-between p-4 rounded-xl bg-gray-50 border border-gray-200 hover:border-gray-300 transition-all">
-              <div>
-                <p className="text-sm font-medium text-gray-900">{addr.line1}{addr.line2 ? `, ${addr.line2}` : ''}</p>
-                <p className="text-sm text-gray-500">{addr.city}, {addr.state} {addr.zip}</p>
-                <p className="text-xs text-gray-400 mt-0.5">{addr.country}</p>
+              <div className="flex gap-3">
+                <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center shrink-0 mt-0.5">
+                  <Home className="w-4 h-4 text-indigo-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">{addr.name}</p>
+                  <p className="text-sm text-gray-600 mt-0.5">{addr.house}</p>
+                  <p className="text-sm text-gray-500">{addr.city}, {addr.state} — {addr.pincode}</p>
+                  {addr.phone && <p className="text-xs text-gray-400 mt-1 flex items-center gap-1"><Phone className="w-3 h-3" />{addr.phone}</p>}
+                </div>
               </div>
               <button onClick={() => handleDeleteAddress(addr._id)} className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all shrink-0">
                 <Trash2 className="w-4 h-4" />

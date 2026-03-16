@@ -34,7 +34,12 @@ export const AuthProvider = ({ children }) => {
           if (pendingSeller && currentUser.role === 'customer' && !currentUser.isSeller) {
             try {
               const sellerData = JSON.parse(pendingSeller);
-              await sellerService.register(sellerData);
+              // Pass logo, shopName, description to register endpoint
+              await sellerService.register({
+                shopName: sellerData.shopName,
+                description: sellerData.description,
+                logo: sellerData.logo || undefined,
+              });
               localStorage.removeItem('pendingSellerRegistration');
 
               // Refresh JWT token to get updated role

@@ -495,6 +495,50 @@ const deleteContact = asyncHandler(async (req, res) => {
   res.json({ success: true, message: "Query deleted" });
 });
 
+/**
+ * GET /api/admin/seller-earnings
+ * Get all sellers with their earnings, commission, and payout status.
+ */
+const getSellerEarnings = asyncHandler(async (req, res) => {
+  const sellers = await SellerProfile.find()
+    .sort({ "metrics.totalSales": -1 })
+    .select("shopName userEmail metrics payoutStatus lastPayoutDate");
+
+  const data = sellers.map((s) => ({
+    _id: s._id,
+    shopName: s.shopName,
+    email: s.userEmail,
+    totalSales: s.metrics.totalSales || 0,
+    commission: s.metrics.commission || 0,
+    netEarnings: s.metrics.netEarnings || 0,
+    currentBalance: s.metrics.currentBalance || 0,
+    payoutStatus: s.payoutStatus || "pending",
+    lastPayoutDate: s.lastPayoutDate,
+  }));
+
+  res.json({ success: true, data: { sellers: data } });
+});
+
+/**
+ * PUT /api/admin/seller/:sellerId/payout
+ * Mark a seller's payout as paid.
+ */
+const markPayoutPaid = asyncHandler(async (req, res) => {
+  const seller = await SellerProfile.findById(req.params.sellerId);
+  if (!seller) throw ApiError.notFound("Seller not found");
+
+  seller.payoutStatus = "paid";
+  seller.lastPayoutDate = new Date();
+  seller.metrics.currentBalance = 0;
+  await seller.save();
+
+  res.json({
+    success: true,
+    message: `Payout marked as paid for ${seller.shopName}`,
+    data: { seller },
+  });
+});
+
 module.exports = {
   getDashboard,
   getProducts,
@@ -509,4 +553,6 @@ module.exports = {
   updateContactStatus,
   replyToContact,
   deleteContact,
+  getSellerEarnings,
+  markPayoutPaid,
 };

@@ -19,8 +19,16 @@ const sellerProfileSchema = new mongoose.Schema(
     metrics: {
       totalSales: { type: Number, default: 0 },
       totalOrders: { type: Number, default: 0 },
+      commission: { type: Number, default: 0 },
+      netEarnings: { type: Number, default: 0 },
       currentBalance: { type: Number, default: 0 },
     },
+    payoutStatus: {
+      type: String,
+      enum: ["pending", "paid"],
+      default: "pending",
+    },
+    lastPayoutDate: { type: Date },
   },
   {
     timestamps: true,

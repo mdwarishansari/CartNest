@@ -13,6 +13,8 @@ const {
   deleteContact,
   deleteUser,
   updateOrderStatus,
+  getSellerEarnings,
+  markPayoutPaid,
 } = require("./admin.controller");
 const {
   verifyProductValidator,
@@ -64,5 +66,9 @@ router.get("/contacts", getContactQueries);
 router.put("/contacts/:id/status", updateContactStatus);
 router.post("/contacts/:id/reply", replyToContact);
 router.delete("/contacts/:id", deleteContact);
+
+// Seller earnings & payouts
+router.get("/seller-earnings", getSellerEarnings);
+router.put("/seller/:sellerId/payout", markPayoutPaid);
 
 module.exports = router;
