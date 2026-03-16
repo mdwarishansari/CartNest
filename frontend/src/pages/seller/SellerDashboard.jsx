@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Package, ShoppingBag, DollarSign, BarChart3, Plus, Trash2, Store, Edit, X, Upload, Save, CheckCircle, Clock, XCircle, Calendar, User, TrendingUp, Percent, Camera, Mail, Phone } from 'lucide-react';
+import { Package, ShoppingBag, DollarSign, BarChart3, Plus, Trash2, Store, Edit, X, Upload, Save, CheckCircle, Clock, XCircle, Calendar, User, TrendingUp, Percent, Camera, Mail, Phone, ImagePlus, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { sellerService, categoryService, userService } from '../../services';
 import { uploadMultipleImages, uploadImage } from '../../services/cloudinary';
@@ -43,13 +43,15 @@ const SellerDashboard = () => {
   // Add product
   const [showAdd, setShowAdd] = useState(false);
   const [addForm, setAddForm] = useState({ title: '', description: '', price: '', mrp: '', categoryId: '', stock: '', tags: '' });
-  const [imageFiles, setImageFiles] = useState([]);
+  const [imageSlots, setImageSlots] = useState([null, null, null, null]);
+  const [imagePreviews, setImagePreviews] = useState([null, null, null, null]);
   const [submitting, setSubmitting] = useState(false);
 
   // Edit product
   const [editingProduct, setEditingProduct] = useState(null);
   const [editForm, setEditForm] = useState({});
-  const [editImageFiles, setEditImageFiles] = useState([]);
+  const [editImageSlots, setEditImageSlots] = useState([null, null, null, null]);
+  const [editImagePreviews, setEditImagePreviews] = useState([null, null, null, null]);
   const [savingEdit, setSavingEdit] = useState(false);
 
   // Edit shop profile
@@ -87,13 +89,30 @@ const SellerDashboard = () => {
     }
   }, [tab]);
 
+  const handleImageSlot = (index, file, isEdit = false) => {
+    if (!file) return;
+    const setSlots = isEdit ? setEditImageSlots : setImageSlots;
+    const setPreviews = isEdit ? setEditImagePreviews : setImagePreviews;
+    setSlots((prev) => { const next = [...prev]; next[index] = file; return next; });
+    setPreviews((prev) => { const next = [...prev]; next[index] = URL.createObjectURL(file); return next; });
+  };
+
+  const removeImageSlot = (index, isEdit = false) => {
+    const setSlots = isEdit ? setEditImageSlots : setImageSlots;
+    const setPreviews = isEdit ? setEditImagePreviews : setImagePreviews;
+    setSlots((prev) => { const next = [...prev]; next[index] = null; return next; });
+    setPreviews((prev) => { const next = [...prev]; if (next[index]) URL.revokeObjectURL(next[index]); next[index] = null; return next; });
+  };
+
   const handleAddProduct = async (e) => {
     e.preventDefault();
+    if (!imageSlots[0]) { toast.error('Primary image is required'); return; }
     setSubmitting(true);
     try {
+      const filesToUpload = imageSlots.filter(Boolean);
       let images = [];
-      if (imageFiles.length > 0) {
-        images = await uploadMultipleImages(imageFiles, 'product');
+      if (filesToUpload.length > 0) {
+        images = await uploadMultipleImages(filesToUpload, 'product');
       }
       const payload = {
         title: addForm.title,
@@ -109,7 +128,8 @@ const SellerDashboard = () => {
       setProducts([res.data.product, ...products]);
       setShowAdd(false);
       setAddForm({ title: '', description: '', price: '', mrp: '', categoryId: '', stock: '', tags: '' });
-      setImageFiles([]);
+      setImageSlots([null, null, null, null]);
+      setImagePreviews([null, null, null, null]);
       toast.success('Product created! It will be visible after verification.');
     } catch (err) { toast.error(err.message || 'Failed to create product'); }
     finally { setSubmitting(false); }
@@ -136,16 +156,29 @@ const SellerDashboard = () => {
       tags: (prod.tags || []).join(', '),
       status: prod.status || 'active',
     });
-    setEditImageFiles([]);
+    setEditImageSlots([null, null, null, null]);
+    setEditImagePreviews([null, null, null, null]);
+  };
+
+  const handleDeleteExistingImage = async (imgIndex) => {
+    try {
+      const img = editingProduct.images[imgIndex];
+      await productService.deleteImage(editingProduct._id, img.public_id);
+      const updatedImages = editingProduct.images.filter((_, i) => i !== imgIndex);
+      setEditingProduct({ ...editingProduct, images: updatedImages });
+      setProducts(products.map((p) => p._id === editingProduct._id ? { ...p, images: updatedImages } : p));
+      toast.success('Image removed');
+    } catch (err) { toast.error(err.message || 'Failed to remove image'); }
   };
 
   const handleEditProduct = async (e) => {
     e.preventDefault();
     setSavingEdit(true);
     try {
+      const filesToUpload = editImageSlots.filter(Boolean);
       let newImages = [];
-      if (editImageFiles.length > 0) {
-        newImages = await uploadMultipleImages(editImageFiles, 'product');
+      if (filesToUpload.length > 0) {
+        newImages = await uploadMultipleImages(filesToUpload, 'product');
       }
       const payload = {
         title: editForm.title,
@@ -157,7 +190,6 @@ const SellerDashboard = () => {
         tags: editForm.tags ? editForm.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
         status: editForm.status,
       };
-      // If new images uploaded, merge with existing
       if (newImages.length > 0) {
         payload.images = [...(editingProduct.images || []), ...newImages];
       }
@@ -555,12 +587,26 @@ const SellerDashboard = () => {
                   <input value={addForm.tags} onChange={(e) => setAddForm({ ...addForm, tags: e.target.value })} className={inputCls} placeholder="electronics, gadget" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Images</label>
-                  <label className="flex items-center justify-center gap-2 p-6 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/50 transition-all">
-                    <Upload className="w-5 h-5 text-gray-400" />
-                    <span className="text-sm text-gray-500">{imageFiles.length > 0 ? `${imageFiles.length} file(s) selected` : 'Click to upload images'}</span>
-                    <input type="file" accept="image/*" multiple onChange={(e) => setImageFiles(Array.from(e.target.files))} className="hidden" />
-                  </label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Product Images</label>
+                  <p className="text-xs text-gray-400 mb-3">Upload up to 4 images. First image is primary and required.</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {[0, 1, 2, 3].map((i) => (
+                      <label key={i} className={`upload-slot ${imagePreviews[i] ? 'has-image' : ''} ${i === 0 ? 'primary' : ''}`}>
+                        {imagePreviews[i] ? (
+                          <>
+                            <img src={imagePreviews[i]} alt="" className="w-full h-full object-cover rounded-[0.85rem]" />
+                            <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); removeImageSlot(i); }} className="remove-btn"><X className="w-3 h-3" /></button>
+                          </>
+                        ) : (
+                          <>
+                            <ImagePlus className="w-6 h-6 text-gray-300 mb-1" />
+                            <span className="text-[10px] font-semibold text-gray-400">{i === 0 ? 'Primary *' : `Image ${i + 1}`}</span>
+                          </>
+                        )}
+                        <input type="file" accept="image/*" onChange={(e) => { if (e.target.files[0]) handleImageSlot(i, e.target.files[0]); e.target.value = ''; }} className="hidden" />
+                      </label>
+                    ))}
+                  </div>
                 </div>
                 <div className="flex gap-2 pt-2">
                   <button type="submit" disabled={submitting}
@@ -635,21 +681,41 @@ const SellerDashboard = () => {
                 {editingProduct.images?.length > 0 && (
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Current Images</label>
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="grid grid-cols-4 gap-2">
                       {editingProduct.images.map((img, i) => (
-                        <img key={i} src={img.url} alt="" className="w-16 h-16 rounded-lg object-cover border border-gray-200" />
+                        <div key={i} className="upload-slot has-image">
+                          <img src={img.url} alt="" className="w-full h-full object-cover rounded-[0.85rem]" />
+                          {i === 0 && <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-indigo-600 text-white text-[8px] font-bold rounded-md">PRIMARY</span>}
+                          <button type="button" onClick={() => handleDeleteExistingImage(i)} className="remove-btn" style={{opacity:1}}><X className="w-3 h-3" /></button>
+                        </div>
                       ))}
                     </div>
                   </div>
                 )}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Add More Images</label>
-                  <label className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/50 transition-all">
-                    <Upload className="w-5 h-5 text-gray-400" />
-                    <span className="text-sm text-gray-500">{editImageFiles.length > 0 ? `${editImageFiles.length} new file(s)` : 'Add images'}</span>
-                    <input type="file" accept="image/*" multiple onChange={(e) => setEditImageFiles(Array.from(e.target.files))} className="hidden" />
-                  </label>
-                </div>
+                {/* Add new images — remaining slots */}
+                {(editingProduct.images?.length || 0) < 4 && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Add More Images ({4 - (editingProduct.images?.length || 0)} slot{4 - (editingProduct.images?.length || 0) !== 1 ? 's' : ''} available)</label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {Array.from({ length: 4 - (editingProduct.images?.length || 0) }).map((_, i) => (
+                        <label key={i} className={`upload-slot ${editImagePreviews[i] ? 'has-image' : ''}`}>
+                          {editImagePreviews[i] ? (
+                            <>
+                              <img src={editImagePreviews[i]} alt="" className="w-full h-full object-cover rounded-[0.85rem]" />
+                              <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); removeImageSlot(i, true); }} className="remove-btn"><X className="w-3 h-3" /></button>
+                            </>
+                          ) : (
+                            <>
+                              <ImagePlus className="w-5 h-5 text-gray-300 mb-0.5" />
+                              <span className="text-[9px] text-gray-400">Add</span>
+                            </>
+                          )}
+                          <input type="file" accept="image/*" onChange={(e) => { if (e.target.files[0]) handleImageSlot(i, e.target.files[0], true); e.target.value = ''; }} className="hidden" />
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div className="flex gap-2 pt-2">
                   <button type="submit" disabled={savingEdit}
                     className="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-60">
