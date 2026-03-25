@@ -320,8 +320,6 @@ See the detailed `.env.example` files in each directory:
 
 ## 🚢 Deployment
 
-See [`DEPLOYMENT.md`](DEPLOYMENT.md) for a step-by-step guide covering:
-
 - **MongoDB Atlas** — Cloud database setup
 - **Render** — Backend deployment
 - **Vercel** — Frontend deployment
@@ -335,5 +333,5 @@ This project is licensed under the **ISC License**.
 ---
 
 <p align="center">
-  Built with ❤️ by <strong>Md Warishan Ansari</strong>
+  Built with ❤️ by <strong>Md Warish Ansari</strong>
 </p>
