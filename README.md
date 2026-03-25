@@ -9,7 +9,11 @@
   <br />
   <em>Empowering local sellers with a modern, secure platform</em>
 </p>
-
+<p align="center">
+  <a href="https://cartnest-shop.vercel.app/" target="_blank">
+    <img src="https://img.shields.io/badge/🌐 Live Demo-Visit Now-0A66C2?style=for-the-badge" alt="Live Demo"/>
+  </a>
+</p>
 <p align="center">
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white" alt="React" />
   <img src="https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white" alt="Vite" />
@@ -51,6 +55,7 @@ The platform supports **four distinct user roles** (Customer, Seller, Admin, Ver
 ## ✨ Key Features
 
 ### 🛍️ Customer Experience
+
 - **Product Browsing** — Search, filter by category/price/sort, and view detailed product pages
 - **Shopping Cart** — Add to cart, update quantities, and price-at-add snapshot
 - **Secure Checkout** — Razorpay payment gateway with address management
@@ -58,6 +63,7 @@ The platform supports **four distinct user roles** (Customer, Seller, Admin, Ver
 - **Account Management** — Profile editing, address book with default address
 
 ### 🏪 Seller Portal
+
 - **Shop Dashboard** — Revenue stats, order counts, and performance charts (Recharts)
 - **Product Management** — Create, edit, delete products with multi-image upload (Cloudinary)
 - **Order Fulfillment** — View incoming orders and update statuses (processing → shipped → delivered)
@@ -65,6 +71,7 @@ The platform supports **four distinct user roles** (Customer, Seller, Admin, Ver
 - **10% Commission Model** — Transparent commission with net earnings tracking
 
 ### 🔒 Admin Panel
+
 - **Admin Dashboard** — Platform-wide stats: users, orders, revenue, products
 - **Product Verification** — Approve/reject seller-submitted products
 - **User Management** — View all users, delete accounts (cascades Firebase + DB)
@@ -74,10 +81,12 @@ The platform supports **four distinct user roles** (Customer, Seller, Admin, Ver
 - **Verifier Account Creation** — Create verifier accounts for product moderation
 
 ### ✅ Verifier Dashboard
+
 - **Product Review** — Dedicated interface to verify/reject pending products
 - **Account Management** — Profile and statistics overview
 
 ### 🔧 Technical Highlights
+
 - **Firebase Authentication** — Secure sign-up/login with email verification
 - **Cloudinary CDN** — Signed image uploads for products and shop logos
 - **Redis Caching** — Optimized stock locking with distributed locks
@@ -89,17 +98,17 @@ The platform supports **four distinct user roles** (Customer, Seller, Admin, Ver
 
 ## 🛠️ Tech Stack
 
-| Layer        | Technology                                                                 |
-|-------------|----------------------------------------------------------------------------|
-| **Frontend** | React 19, Vite 7, Tailwind CSS 4, Framer Motion, Recharts, Lucide Icons   |
-| **Backend**  | Node.js, Express 4, Mongoose 8                                             |
-| **Database** | MongoDB Atlas                                                              |
-| **Auth**     | Firebase Authentication (Client) + Firebase Admin SDK (Server) + JWT       |
-| **Payments** | Razorpay (Order creation + Payment verification + Webhook support)         |
-| **Storage**  | Cloudinary (Signed uploads for product images & shop logos)                 |
-| **Cache**    | Redis / Upstash (Distributed locking for stock management)                 |
-| **Email**    | Nodemailer (SMTP — Gmail App Passwords or SendGrid)                        |
-| **Styling**  | Tailwind CSS 4 + custom CSS animations + Framer Motion                     |
+| Layer        | Technology                                                              |
+| ------------ | ----------------------------------------------------------------------- |
+| **Frontend** | React 19, Vite 7, Tailwind CSS 4, Framer Motion, Recharts, Lucide Icons |
+| **Backend**  | Node.js, Express 4, Mongoose 8                                          |
+| **Database** | MongoDB Atlas                                                           |
+| **Auth**     | Firebase Authentication (Client) + Firebase Admin SDK (Server) + JWT    |
+| **Payments** | Razorpay (Order creation + Payment verification + Webhook support)      |
+| **Storage**  | Cloudinary (Signed uploads for product images & shop logos)             |
+| **Cache**    | Redis / Upstash (Distributed locking for stock management)              |
+| **Email**    | Nodemailer (SMTP — Gmail App Passwords or SendGrid)                     |
+| **Styling**  | Tailwind CSS 4 + custom CSS animations + Framer Motion                  |
 
 ---
 
@@ -210,7 +219,7 @@ CartNest/
 - **Firebase** — [Firebase Console](https://console.firebase.google.com) (Authentication enabled)
 - **Cloudinary** — [Cloudinary Dashboard](https://console.cloudinary.com)
 - **Razorpay** — [Razorpay Dashboard](https://dashboard.razorpay.com) (test keys for development)
-- **Redis** *(optional)* — [Upstash](https://upstash.com) or local Redis
+- **Redis** _(optional)_ — [Upstash](https://upstash.com) or local Redis
 
 ### Installation
 
@@ -250,10 +259,10 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 See the detailed `.env.example` files in each directory:
 
-| File | Description |
-|------|-------------|
-| [`backend/.env.example`](backend/.env.example) | MongoDB, JWT, Firebase Admin, Cloudinary, Razorpay, Redis, SMTP |
-| [`frontend/.env.example`](frontend/.env.example) | API URL, Firebase Client, Cloudinary, Razorpay key |
+| File                                             | Description                                                     |
+| ------------------------------------------------ | --------------------------------------------------------------- |
+| [`backend/.env.example`](backend/.env.example)   | MongoDB, JWT, Firebase Admin, Cloudinary, Razorpay, Redis, SMTP |
+| [`frontend/.env.example`](frontend/.env.example) | API URL, Firebase Client, Cloudinary, Razorpay key              |
 
 ---
 
@@ -261,57 +270,58 @@ See the detailed `.env.example` files in each directory:
 
 ### Backend
 
-| Script | Command | Description |
-|--------|---------|-------------|
-| Development | `npm run dev` | Start with nodemon (auto-reload) |
-| Production | `npm start` | Start with node |
-| Seed Admin | `npm run seed:admin` | Create initial admin user |
-| Lint | `npm run lint` | Run ESLint |
+| Script      | Command              | Description                      |
+| ----------- | -------------------- | -------------------------------- |
+| Development | `npm run dev`        | Start with nodemon (auto-reload) |
+| Production  | `npm start`          | Start with node                  |
+| Seed Admin  | `npm run seed:admin` | Create initial admin user        |
+| Lint        | `npm run lint`       | Run ESLint                       |
 
 ### Frontend
 
-| Script | Command | Description |
-|--------|---------|-------------|
-| Development | `npm run dev` | Start Vite dev server |
-| Build | `npm run build` | Production build |
-| Preview | `npm run preview` | Preview production build locally |
-| Lint | `npm run lint` | Run ESLint |
+| Script      | Command           | Description                      |
+| ----------- | ----------------- | -------------------------------- |
+| Development | `npm run dev`     | Start Vite dev server            |
+| Build       | `npm run build`   | Production build                 |
+| Preview     | `npm run preview` | Preview production build locally |
+| Lint        | `npm run lint`    | Run ESLint                       |
 
 ---
 
 ## 👥 User Roles
 
-| Role | Access | Description |
-|------|--------|-------------|
-| **Customer** | Public pages, Cart, Checkout, Orders, Account | Default role after signup |
-| **Seller** | Seller Dashboard, Product CRUD, Order management | Registered via seller signup flow |
-| **Admin** | Full admin panel, user/product/order/payout management | Seeded via `npm run seed:admin` |
-| **Verifier** | Product verification dashboard | Created by admin |
+| Role         | Access                                                 | Description                       |
+| ------------ | ------------------------------------------------------ | --------------------------------- |
+| **Customer** | Public pages, Cart, Checkout, Orders, Account          | Default role after signup         |
+| **Seller**   | Seller Dashboard, Product CRUD, Order management       | Registered via seller signup flow |
+| **Admin**    | Full admin panel, user/product/order/payout management | Seeded via `npm run seed:admin`   |
+| **Verifier** | Product verification dashboard                         | Created by admin                  |
 
 ---
 
 ## 🌐 API Endpoints
 
-| Module | Prefix | Key Operations |
-|--------|--------|----------------|
-| Auth | `/api/auth` | `POST /session`, `POST /refresh-token`, `GET /me`, `POST /logout` |
-| Users | `/api/users` | `GET/PUT /profile`, `POST/PUT/DELETE /address` |
-| Seller | `/api/seller` | `POST /register`, `GET /dashboard`, CRUD `/product`, `GET /orders` |
-| Products | `/api/products` | `GET /` (with search/filter), `GET /:slug` |
-| Categories | `/api/categories` | CRUD operations |
-| Cart | `/api/cart` | `GET /`, `POST /`, `PUT /`, `DELETE /:id`, `DELETE /clear` |
-| Orders | `/api/orders` | `POST /checkout`, `GET /`, `GET /:id`, `POST /:id/cancel` |
-| Payments | `/api/payments` | `POST /verify` (Razorpay signature verification) |
-| Contact | `/api/contact` | `POST /` (submit inquiry) |
-| Cloudinary | `/api/cloudinary` | `GET /sign` (signed upload params) |
-| Admin | `/api/admin` | Dashboard, users, products, orders, contacts, payouts |
-| Health | `/api/health` | `GET /` (server status check) |
+| Module     | Prefix            | Key Operations                                                     |
+| ---------- | ----------------- | ------------------------------------------------------------------ |
+| Auth       | `/api/auth`       | `POST /session`, `POST /refresh-token`, `GET /me`, `POST /logout`  |
+| Users      | `/api/users`      | `GET/PUT /profile`, `POST/PUT/DELETE /address`                     |
+| Seller     | `/api/seller`     | `POST /register`, `GET /dashboard`, CRUD `/product`, `GET /orders` |
+| Products   | `/api/products`   | `GET /` (with search/filter), `GET /:slug`                         |
+| Categories | `/api/categories` | CRUD operations                                                    |
+| Cart       | `/api/cart`       | `GET /`, `POST /`, `PUT /`, `DELETE /:id`, `DELETE /clear`         |
+| Orders     | `/api/orders`     | `POST /checkout`, `GET /`, `GET /:id`, `POST /:id/cancel`          |
+| Payments   | `/api/payments`   | `POST /verify` (Razorpay signature verification)                   |
+| Contact    | `/api/contact`    | `POST /` (submit inquiry)                                          |
+| Cloudinary | `/api/cloudinary` | `GET /sign` (signed upload params)                                 |
+| Admin      | `/api/admin`      | Dashboard, users, products, orders, contacts, payouts              |
+| Health     | `/api/health`     | `GET /` (server status check)                                      |
 
 ---
 
 ## 🚢 Deployment
 
 See [`DEPLOYMENT.md`](DEPLOYMENT.md) for a step-by-step guide covering:
+
 - **MongoDB Atlas** — Cloud database setup
 - **Render** — Backend deployment
 - **Vercel** — Frontend deployment
