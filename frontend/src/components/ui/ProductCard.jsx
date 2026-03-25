@@ -1,11 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ShoppingCart, Eye } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 
 const ProductCard = ({ product }) => {
-  const { addItem } = useCart();
+  const { addToCart } = useCart();
+  const { isAuthenticated, isSeller, isAdmin, isVerifier } = useAuth();
+  const navigate = useNavigate();
+  const showCartButton = !isSeller && !isAdmin && !isVerifier;
   const allImages = product.images?.length > 0 ? product.images : [{ url: 'https://placehold.co/300x300/e2e8f0/94a3b8?text=Product' }];
   const discount = product.mrp && product.mrp > product.price ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0;
 
@@ -89,13 +93,22 @@ const ProductCard = ({ product }) => {
               <span className="text-sm text-gray-400 line-through ml-2">₹{product.mrp?.toLocaleString('en-IN')}</span>
             )}
           </div>
-          <button
-            onClick={(e) => { e.preventDefault(); addItem(product._id, 1); }}
-            className="p-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95"
-            title="Add to Cart"
-          >
-            <ShoppingCart className="w-4 h-4" />
-          </button>
+          {showCartButton && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                if (!isAuthenticated) {
+                  navigate('/auth/login');
+                  return;
+                }
+                addToCart(product._id, 1);
+              }}
+              className="p-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95"
+              title="Add to Cart"
+            >
+              <ShoppingCart className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
     </motion.div>
