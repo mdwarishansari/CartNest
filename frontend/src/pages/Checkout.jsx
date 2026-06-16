@@ -121,7 +121,7 @@ const Checkout = () => {
           }
         },
         prefill: { name: shippingAddress.name, email: user?.email },
-        theme: { color: '#4f46e5' },
+        theme: { color: '#000000' },
       };
 
       const rzp = new window.Razorpay(options);
