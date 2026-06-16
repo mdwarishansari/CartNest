@@ -86,58 +86,140 @@ const Home = () => {
             <div className="absolute w-72 h-72 rounded-full border border-ash/60 bg-cream-paper/40 -z-10" />
 
             {/* 1. Featured Product Card */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
-              whileHover={{ y: -5 }}
-              className="absolute w-60 bg-pure-white border border-ash rounded-md p-3 z-10"
-              style={{ transform: 'rotate(-2deg)' }}
-            >
-              <div className="aspect-square bg-cream-paper rounded-md overflow-hidden relative mb-2.5">
-                {/* SVG mock illustration representing a ceramic vase */}
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-[#e3ded9] to-[#c7c0b7] p-8">
-                  <svg viewBox="0 0 100 100" className="w-24 h-24 text-charcoal/30">
-                    <path d="M50,15 C45,15 40,25 40,40 C40,55 30,60 30,75 C30,85 70,85 70,75 C70,60 60,55 60,40 C60,25 55,15 50,15 Z" fill="#eae6e1" stroke="#333" strokeWidth="1" />
-                    <line x1="30" y1="75" x2="70" y2="75" stroke="#333" strokeWidth="1" />
-                    <ellipse cx="50" cy="15" rx="10" ry="3" fill="#ffffff" stroke="#333" strokeWidth="1" />
-                  </svg>
+            {products.length > 0 ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+                whileHover={{ y: -5 }}
+                className="absolute w-60 bg-pure-white border border-ash rounded-md p-3 z-10"
+                style={{ transform: 'rotate(-2deg)' }}
+              >
+                <Link to={`/product/${products[0].slug}`} className="block">
+                  <div className="aspect-square bg-cream-paper rounded-md overflow-hidden relative mb-2.5">
+                    {products[0].images?.[0]?.url ? (
+                      <img
+                        src={products[0].images[0].url}
+                        alt={products[0].title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-[#e3ded9] to-[#c7c0b7] p-8">
+                        <svg viewBox="0 0 100 100" className="w-24 h-24 text-charcoal/30">
+                          <path d="M50,15 C45,15 40,25 40,40 C40,55 30,60 30,75 C30,85 70,85 70,75 C70,60 60,55 60,40 C60,25 55,15 50,15 Z" fill="#eae6e1" stroke="#333" strokeWidth="1" />
+                          <line x1="30" y1="75" x2="70" y2="75" stroke="#333" strokeWidth="1" />
+                          <ellipse cx="50" cy="15" rx="10" ry="3" fill="#ffffff" stroke="#333" strokeWidth="1" />
+                        </svg>
+                      </div>
+                    )}
+                    <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-butter-highlight text-[8px] font-semibold border border-ink-black/10 rounded-md">Featured</span>
+                  </div>
+                  <div className="font-graphik text-[10px] text-smoke uppercase tracking-wider mb-0.5">
+                    {products[0].sellerId?.shopName || 'Local Seller'}
+                  </div>
+                  <h3 className="font-graphik text-caption font-normal text-charcoal truncate mb-2">
+                    {products[0].title}
+                  </h3>
+                  <div className="flex justify-between items-center">
+                    <span className="text-caption font-semibold text-ink-black">
+                      ₹{products[0].price?.toLocaleString('en-IN')}
+                    </span>
+                    <span className="p-1 px-2 border border-ash rounded-md text-[10px] font-graphik font-semibold">View</span>
+                  </div>
+                </Link>
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+                whileHover={{ y: -5 }}
+                className="absolute w-60 bg-pure-white border border-ash rounded-md p-3 z-10"
+                style={{ transform: 'rotate(-2deg)' }}
+              >
+                <div className="aspect-square bg-cream-paper rounded-md overflow-hidden relative mb-2.5">
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-[#e3ded9] to-[#c7c0b7] p-8">
+                    <svg viewBox="0 0 100 100" className="w-24 h-24 text-charcoal/30">
+                      <path d="M50,15 C45,15 40,25 40,40 C40,55 30,60 30,75 C30,85 70,85 70,75 C70,60 60,55 60,40 C60,25 55,15 50,15 Z" fill="#eae6e1" stroke="#333" strokeWidth="1" />
+                      <line x1="30" y1="75" x2="70" y2="75" stroke="#333" strokeWidth="1" />
+                      <ellipse cx="50" cy="15" rx="10" ry="3" fill="#ffffff" stroke="#333" strokeWidth="1" />
+                    </svg>
+                  </div>
+                  <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-butter-highlight text-[8px] font-semibold border border-ink-black/10 rounded-md">Featured</span>
                 </div>
-                <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-butter-highlight text-[8px] font-semibold border border-ink-black/10 rounded-md">Featured</span>
-              </div>
-              <div className="font-graphik text-[10px] text-smoke uppercase tracking-wider mb-0.5">Studio Clay</div>
-              <h3 className="font-graphik text-caption font-normal text-charcoal truncate mb-2">Artisan Ceramic Vase</h3>
-              <div className="flex justify-between items-center">
-                <span className="text-caption font-semibold text-ink-black">₹2,400</span>
-                <span className="p-1 px-2 border border-ash rounded-md text-[10px] font-graphik font-semibold">View</span>
-              </div>
-            </motion.div>
+                <div className="font-graphik text-[10px] text-smoke uppercase tracking-wider mb-0.5">Studio Clay</div>
+                <h3 className="font-graphik text-caption font-normal text-charcoal truncate mb-2">Artisan Ceramic Vase</h3>
+                <div className="flex justify-between items-center">
+                  <span className="text-caption font-semibold text-ink-black">₹2,400</span>
+                  <span className="p-1 px-2 border border-ash rounded-md text-[10px] font-graphik font-semibold">View</span>
+                </div>
+              </motion.div>
+            )}
 
             {/* 2. Seller Rating Card */}
-            <motion.div
-              initial={{ opacity: 0, x: 50, y: -40 }}
-              animate={{ opacity: 1, x: 0, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.6 }}
-              whileHover={{ scale: 1.03 }}
-              className="absolute top-10 right-2 w-48 bg-pure-white border border-ash rounded-md p-3.5 z-20"
-              style={{ transform: 'rotate(4deg)' }}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 rounded-full bg-ink-black flex items-center justify-center text-pure-white text-xs font-bold font-graphik">S</div>
-                <div>
-                  <h4 className="font-graphik text-[11px] font-semibold text-ink-black">Studio Clay</h4>
-                  <p className="text-[9px] text-smoke">New Delhi, IN</p>
+            {products.length > 0 && products[0].sellerId ? (
+              <motion.div
+                initial={{ opacity: 0, x: 50, y: -40 }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+                whileHover={{ scale: 1.03 }}
+                className="absolute top-10 right-2 w-48 bg-pure-white border border-ash rounded-md p-3.5 z-20"
+                style={{ transform: 'rotate(4deg)' }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  {products[0].sellerId.logo?.url ? (
+                    <img
+                      src={products[0].sellerId.logo.url}
+                      alt=""
+                      className="w-7 h-7 rounded-full object-cover border border-ash"
+                    />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-ink-black flex items-center justify-center text-pure-white text-[10px] font-bold font-graphik">
+                      {products[0].sellerId.shopName?.charAt(0).toUpperCase() || 'S'}
+                    </div>
+                  )}
+                  <div>
+                    <h4 className="font-graphik text-[11px] font-semibold text-ink-black truncate max-w-[100px]">
+                      {products[0].sellerId.shopName}
+                    </h4>
+                    <p className="text-[9px] text-smoke">Verified Supplier</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-1.5 border-t border-ash/60 pt-2">
-                <span className="text-caption font-bold text-ink-black">4.9</span>
-                <span className="text-[#e2a000] text-[10px]">★★★★★</span>
-                <span className="text-[10px] text-smoke">(84)</span>
-              </div>
-              <span className="inline-block mt-2 px-2 py-0.5 text-[8px] font-semibold uppercase rounded-3xl bg-[#f2fcf5] text-green-700 border border-green-200">
-                Verified Seller
-              </span>
-            </motion.div>
+                <div className="flex items-center gap-1.5 border-t border-ash/60 pt-2">
+                  <span className="text-caption font-bold text-ink-black">5.0</span>
+                  <span className="text-[#e2a000] text-[10px]">★★★★★</span>
+                  <span className="text-[10px] text-smoke">(Verified)</span>
+                </div>
+                <span className="inline-block mt-2 px-2 py-0.5 text-[8px] font-semibold uppercase rounded-3xl bg-[#f2fcf5] text-green-700 border border-green-200">
+                  Verified Seller
+                </span>
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, x: 50, y: -40 }}
+                animate={{ opacity: 1, x: 0, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+                whileHover={{ scale: 1.03 }}
+                className="absolute top-10 right-2 w-48 bg-pure-white border border-ash rounded-md p-3.5 z-20"
+                style={{ transform: 'rotate(4deg)' }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-7 h-7 rounded-full bg-ink-black flex items-center justify-center text-pure-white text-xs font-bold font-graphik">S</div>
+                  <div>
+                    <h4 className="font-graphik text-[11px] font-semibold text-ink-black">Studio Clay</h4>
+                    <p className="text-[9px] text-smoke">New Delhi, IN</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 border-t border-ash/60 pt-2">
+                  <span className="text-caption font-bold text-ink-black">4.9</span>
+                  <span className="text-[#e2a000] text-[10px]">★★★★★</span>
+                  <span className="text-[10px] text-smoke">(84)</span>
+                </div>
+                <span className="inline-block mt-2 px-2 py-0.5 text-[8px] font-semibold uppercase rounded-3xl bg-[#f2fcf5] text-green-700 border border-green-200">
+                  Verified Seller
+                </span>
+              </motion.div>
+            )}
 
             {/* 3. Orders Statistics Card */}
             <motion.div
