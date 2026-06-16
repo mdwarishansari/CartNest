@@ -41,12 +41,6 @@ const Navbar = () => {
 
   return (
     <header className="w-full flex flex-col z-50 bg-pure-white">
-      {/* Promo Announcement Banner */}
-      <div className="bg-cream-paper border-b border-ash text-center py-2 text-caption font-graphik text-charcoal">
-        <span>Shop wholesale online from over 100,000 brands. </span>
-        <Link to="/auth/signup" className="underline font-normal text-ink-black hover:text-charcoal transition-colors">Sign up to buy</Link>
-      </div>
-
       <nav className="sticky top-0 bg-pure-white border-b border-ash">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -66,12 +60,11 @@ const Navbar = () => {
                 />
               </form>
             ) : (
-              <Link to="/" className="flex items-center gap-2.5 shrink-0">
-                <img src="/logo.png" alt="CartNest" className="w-8 h-8 rounded-md object-contain" />
-                <span className="text-lg font-graphik font-normal tracking-[0.25em] text-ink-black uppercase hidden sm:block">CartNest</span>
+              <Link to="/" className="flex items-center gap-3 shrink-0">
+                <img src="/logo.png" alt="CartNest" className="h-9 w-auto object-contain" />
+                <span className="text-[20px] font-nantes font-normal tracking-[0.1em] text-ink-black uppercase hidden sm:block">CartNest</span>
               </Link>
             )}
-
             {/* Search — Desktop (hidden on search page or when mobile search is active) */}
             {!isSearchPage && !mobileSearchOpen && (
               <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md mx-8">
