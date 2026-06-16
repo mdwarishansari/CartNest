@@ -226,7 +226,7 @@ const Home = () => {
                   transition={{ delay: i * 0.05 }}
                 >
                   <Link
-                    to={`/search?category=${encodeURIComponent(cat.name)}`}
+                    to={`/search?category=${encodeURIComponent(cat.slug)}`}
                     className="block shrink-0 px-6 py-3 rounded-3xl bg-pure-white border border-charcoal text-caption font-graphik text-ink-black hover:bg-ink-black hover:text-pure-white transition-all whitespace-nowrap"
                   >
                     {cat.name}
