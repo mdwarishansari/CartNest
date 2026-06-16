@@ -3,6 +3,8 @@ const {
   getDashboard,
   getProducts,
   verifyProduct,
+  updateProduct,
+  deleteProduct,
   getOrders,
   getUsers,
   createVerifier,
@@ -39,6 +41,12 @@ router.put(
 
 // Admin-only routes
 router.use(authorize("admin"));
+
+// PUT /api/admin/products/:id
+router.put("/products/:id", updateProduct);
+
+// DELETE /api/admin/products/:id
+router.delete("/products/:id", deleteProduct);
 
 // GET /api/admin/dashboard
 router.get("/dashboard", getDashboard);

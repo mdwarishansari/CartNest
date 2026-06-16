@@ -53,17 +53,16 @@ const getProducts = asyncHandler(async (req, res) => {
     if (maxPrice) filter.price.$lte = Number(maxPrice);
   }
 
-  // Text search
+  // Regex-based partial text search
   if (search) {
-    filter.$text = { $search: search };
+    filter.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } },
+      { tags: { $in: [new RegExp(search, "i")] } },
+    ];
   }
 
-  // When using $text search, MongoDB requires textScore sort unless explicit sort is given
-  // If sort is the default and we have text search, use textScore for relevance
   let sortOption = sort;
-  if (search && sort === "-createdAt") {
-    sortOption = { score: { $meta: "textScore" }, createdAt: -1 };
-  }
 
   const products = await Product.find(filter)
     .sort(sortOption)

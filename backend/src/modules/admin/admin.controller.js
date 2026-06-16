@@ -82,7 +82,13 @@ const getProducts = asyncHandler(async (req, res) => {
   if (verificationState) filter.verificationState = verificationState;
   if (status) filter.status = status;
   else filter.status = { $ne: "deleted" };
-  if (search) filter.$text = { $search: search };
+  if (search) {
+    filter.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } },
+      { tags: { $in: [new RegExp(search, "i")] } },
+    ];
+  }
 
   const products = await Product.find(filter)
     .sort({ createdAt: -1 })
@@ -539,10 +545,60 @@ const markPayoutPaid = asyncHandler(async (req, res) => {
   });
 });
 
+/**
+ * PUT /api/admin/products/:id
+ */
+const updateProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (!product) throw ApiError.notFound("Product not found");
+
+  const { title, description, price, mrp, categoryId, stock, status, tags, images } = req.body;
+
+  if (title) product.title = title;
+  if (description !== undefined) product.description = description;
+  if (price !== undefined) product.price = price;
+  if (mrp !== undefined) product.mrp = mrp;
+  if (categoryId) product.categoryId = categoryId;
+  if (stock !== undefined) product.stock = stock;
+  if (status) product.status = status;
+  if (tags) product.tags = tags;
+  if (images) product.images = images;
+
+  await product.save();
+
+  const updatedProduct = await Product.findById(product._id)
+    .populate("categoryId", "name slug")
+    .populate("sellerId", "shopName shopSlug logo");
+
+  res.json({
+    success: true,
+    message: "Product updated successfully by admin",
+    data: { product: updatedProduct },
+  });
+});
+
+/**
+ * DELETE /api/admin/products/:id
+ */
+const deleteProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (!product) throw ApiError.notFound("Product not found");
+
+  product.status = "deleted";
+  await product.save();
+
+  res.json({
+    success: true,
+    message: "Product deleted successfully by admin",
+  });
+});
+
 module.exports = {
   getDashboard,
   getProducts,
   verifyProduct,
+  updateProduct,
+  deleteProduct,
   getOrders,
   updateOrderStatus,
   getUsers,
