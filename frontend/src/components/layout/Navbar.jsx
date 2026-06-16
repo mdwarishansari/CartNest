@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingCart, Search, Menu, X, User, LogOut, ChevronDown, Shield, Store, ClipboardCheck, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { auth } from '../../config/firebase';
 import toast from 'react-hot-toast';
+import { categoryService } from '../../services';
 
 const Navbar = () => {
   const { user, isAdmin, isSeller, isVerifier } = useAuth();
@@ -16,6 +17,13 @@ const Navbar = () => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [q, setQ] = useState('');
+  const [navCategories, setNavCategories] = useState([]);
+
+  useEffect(() => {
+    categoryService.getAll()
+      .then((res) => setNavCategories(res.data.categories || []))
+      .catch((err) => console.error('Failed to load navbar categories:', err));
+  }, []);
 
   const isSearchPage = location.pathname === '/search';
 
@@ -43,7 +51,7 @@ const Navbar = () => {
     <header className="w-full flex flex-col z-50 bg-pure-white">
       <nav className="sticky top-0 bg-pure-white border-b border-ash">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-20">
             
             {/* Left side: Logo / Mobile Search */}
             {mobileSearchOpen ? (
@@ -61,7 +69,7 @@ const Navbar = () => {
               </form>
             ) : (
               <Link to="/" className="flex items-center gap-3 shrink-0">
-                <img src="/logo.png" alt="CartNest" className="h-9 w-auto object-contain" />
+                <img src="/logo.png" alt="CartNest" className="h-12 w-auto object-contain" />
                 <span className="text-[20px] font-nantes font-normal tracking-[0.1em] text-ink-black uppercase hidden sm:block">CartNest</span>
               </Link>
             )}
@@ -69,12 +77,12 @@ const Navbar = () => {
             {!isSearchPage && !mobileSearchOpen && (
               <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md mx-8">
                 <div className="relative w-full">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-charcoal" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-charcoal" />
                   <input
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
                     placeholder="Search products..."
-                    className="w-full pl-10 pr-4 py-2 text-caption font-graphik text-charcoal border border-ash rounded-3xl bg-pure-white outline-none focus:border-charcoal transition-all"
+                    className="w-full pl-11 pr-4 py-2.5 text-caption font-graphik text-charcoal border border-ash rounded-3xl bg-pure-white outline-none focus:border-charcoal transition-all"
                   />
                 </div>
               </form>
@@ -133,53 +141,43 @@ const Navbar = () => {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 8, scale: 0.95 }}
                             transition={{ duration: 0.1 }}
-                            className="absolute right-0 mt-2 w-56 bg-pure-white rounded-md border border-ash py-2 z-50"
+                            className="absolute right-0 mt-2 w-72 bg-pure-white rounded-md border border-ash py-3.5 z-50 shadow-md"
                           >
-                            <div className="px-4 py-3 border-b border-ash">
+                            <div className="px-5 py-4 border-b border-ash">
                               <p className="text-caption font-semibold text-ink-black truncate">{user.name}</p>
                               <p className="text-[12px] text-smoke truncate">{user.email}</p>
-                              <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-semibold uppercase rounded-3xl bg-cream-paper text-charcoal border border-ash">
+                              <span className="inline-block mt-1 px-2.5 py-0.5 text-[9px] font-semibold uppercase rounded-3xl bg-cream-paper text-charcoal border border-ash">
                                 {user.role}
                               </span>
                             </div>
                             <div className="py-1">
-                              {(user.role === 'customer' || user.role === 'seller') && (
+                              {(user.role === 'customer' || user.role === 'seller' || isAdmin) && (
                                 <>
-                                  <Link to="/account" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-caption font-graphik text-charcoal hover:bg-cream-paper transition-colors">
+                                  <Link to="/account" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-5 py-2.5 text-caption font-graphik text-charcoal hover:bg-cream-paper transition-colors">
                                     <User className="w-4 h-4 text-smoke" /> My Account
                                   </Link>
-                                  <Link to="/orders" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-caption font-graphik text-charcoal hover:bg-cream-paper transition-colors">
+                                  <Link to="/orders" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-5 py-2.5 text-caption font-graphik text-charcoal hover:bg-cream-paper transition-colors">
                                     <ShoppingBag className="w-4 h-4 text-smoke" /> My Orders
                                   </Link>
                                 </>
                               )}
 
-                              {isSeller && (
-                                <Link to="/seller/dashboard" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-caption font-graphik text-ink-black hover:bg-cream-paper transition-colors font-medium">
+                              {(isSeller || isAdmin) && (
+                                <Link to="/seller/dashboard" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-5 py-2.5 text-caption font-graphik text-ink-black hover:bg-cream-paper transition-colors font-medium">
                                   <Store className="w-4 h-4 text-ink-black" /> Seller Dashboard
                                 </Link>
                               )}
 
-                              {isVerifier && !isAdmin && (
-                                <>
-                                  <Link to="/account" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-caption font-graphik text-charcoal hover:bg-cream-paper transition-colors">
-                                    <User className="w-4 h-4 text-smoke" /> My Account
-                                  </Link>
-                                  <Link to="/verifier" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-caption font-graphik text-ink-black hover:bg-cream-paper transition-colors font-medium">
-                                    <ClipboardCheck className="w-4 h-4 text-ink-black" /> Verifier Panel
-                                  </Link>
-                                </>
+                              {(isVerifier || isAdmin) && (
+                                <Link to="/verifier" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-5 py-2.5 text-caption font-graphik text-ink-black hover:bg-cream-paper transition-colors font-medium">
+                                  <ClipboardCheck className="w-4 h-4 text-ink-black" /> Verifier Panel
+                                </Link>
                               )}
 
                               {isAdmin && (
-                                <>
-                                  <Link to="/account" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-caption font-graphik text-charcoal hover:bg-cream-paper transition-colors">
-                                    <User className="w-4 h-4 text-smoke" /> My Account
-                                  </Link>
-                                  <Link to="/admin" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-caption font-graphik text-ink-black hover:bg-cream-paper transition-colors font-medium">
-                                    <Shield className="w-4 h-4 text-ink-black" /> Admin Panel
-                                  </Link>
-                                </>
+                                <Link to="/admin" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-5 py-2.5 text-caption font-graphik text-ink-black hover:bg-cream-paper transition-colors font-medium">
+                                  <Shield className="w-4 h-4 text-ink-black" /> Admin Panel
+                                </Link>
                               )}
                             </div>
                             <div className="border-t border-ash pt-1">
@@ -195,7 +193,7 @@ const Navbar = () => {
                 ) : (
                   <div className="hidden md:flex items-center gap-4">
                     <Link to="/auth/login" className="text-caption font-graphik text-charcoal hover:text-ink-black transition-colors">Login</Link>
-                    <Link to="/auth/signup" className="px-5 py-2 bg-ink-black text-pure-white text-caption font-graphik rounded-md hover:bg-charcoal transition-all">Sign Up</Link>
+                    <Link to="/auth/signup" className="px-6 py-2.5 bg-ink-black text-pure-white text-caption font-graphik rounded-md hover:bg-charcoal transition-all">Sign Up</Link>
                   </div>
                 )}
 
@@ -244,7 +242,7 @@ const Navbar = () => {
                     <div className="px-2 py-1 text-xs text-smoke font-semibold uppercase tracking-wider">
                       Signed in as {user.name}
                     </div>
-                    {(user.role === 'customer' || user.role === 'seller') && (
+                    {(user.role === 'customer' || user.role === 'seller' || isAdmin) && (
                       <>
                         <Link to="/account" onClick={() => setOpen(false)} className="block py-2 px-2 text-caption font-graphik text-charcoal hover:bg-cream-paper rounded-md transition-colors">
                           My Account
@@ -254,12 +252,12 @@ const Navbar = () => {
                         </Link>
                       </>
                     )}
-                    {isSeller && (
+                    {(isSeller || isAdmin) && (
                       <Link to="/seller/dashboard" onClick={() => setOpen(false)} className="block py-2 px-2 text-caption font-semibold text-ink-black hover:bg-cream-paper rounded-md transition-colors">
                         Seller Dashboard
                       </Link>
                     )}
-                    {isVerifier && !isAdmin && (
+                    {(isVerifier || isAdmin) && (
                       <Link to="/verifier" onClick={() => setOpen(false)} className="block py-2 px-2 text-caption font-semibold text-ink-black hover:bg-cream-paper rounded-md transition-colors">
                         Verifier Panel
                       </Link>
@@ -284,30 +282,15 @@ const Navbar = () => {
       <div className="hidden md:block bg-pure-white border-b border-ash/40 py-2.5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-6 text-caption font-graphik text-charcoal overflow-x-auto whitespace-nowrap scrollbar-hide py-1">
-            {['Featured', 'New', 'Home Decor', 'Food & Drink', 'Women', 'Beauty & Wellness', 'Jewelry', 'Kids & Baby', 'Men', 'Books'].map((item) => {
-              const categorySlugMap = {
-                'Featured': 'featured',
-                'New': 'new',
-                'Home Decor': 'home-decor',
-                'Food & Drink': 'food-drink',
-                'Women': 'women',
-                'Beauty & Wellness': 'beauty-wellness',
-                'Jewelry': 'jewelry',
-                'Kids & Baby': 'kids-baby',
-                'Men': 'men',
-                'Books': 'books'
-              };
-              const slug = categorySlugMap[item] || item.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-              return (
-                <Link
-                  key={item}
-                  to={`/search?category=${encodeURIComponent(slug)}`}
-                  className="hover:text-ink-black transition-colors"
-                >
-                  {item}
-                </Link>
-              );
-            })}
+            {navCategories.map((cat) => (
+              <Link
+                key={cat._id}
+                to={`/search?category=${encodeURIComponent(cat.slug)}`}
+                className="hover:text-ink-black transition-colors"
+              >
+                {cat.name}
+              </Link>
+            ))}
           </div>
         </div>
       </div>
