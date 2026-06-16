@@ -193,7 +193,7 @@ const Navbar = () => {
                     </AnimatePresence>
                   </div>
                 ) : (
-                  <div className="hidden sm:flex items-center gap-4">
+                  <div className="hidden md:flex items-center gap-4">
                     <Link to="/auth/login" className="text-caption font-graphik text-charcoal hover:text-ink-black transition-colors">Login</Link>
                     <Link to="/auth/signup" className="px-5 py-2 bg-ink-black text-pure-white text-caption font-graphik rounded-md hover:bg-charcoal transition-all">Sign Up</Link>
                   </div>
@@ -234,10 +234,44 @@ const Navbar = () => {
                     Sell on CartNest →
                   </Link>
                 )}
-                {!user && (
+                {!user ? (
                   <div className="flex gap-2 pt-2">
                     <Link to="/auth/login" onClick={() => setOpen(false)} className="flex-1 text-center py-2 border border-ash rounded-md text-caption font-graphik text-charcoal hover:bg-cream-paper">Login</Link>
                     <Link to="/auth/signup" onClick={() => setOpen(false)} className="flex-1 text-center py-2 bg-ink-black text-pure-white rounded-md text-caption font-graphik">Sign Up</Link>
+                  </div>
+                ) : (
+                  <div className="space-y-2 pt-2 border-t border-ash/40">
+                    <div className="px-2 py-1 text-xs text-smoke font-semibold uppercase tracking-wider">
+                      Signed in as {user.name}
+                    </div>
+                    {(user.role === 'customer' || user.role === 'seller') && (
+                      <>
+                        <Link to="/account" onClick={() => setOpen(false)} className="block py-2 px-2 text-caption font-graphik text-charcoal hover:bg-cream-paper rounded-md transition-colors">
+                          My Account
+                        </Link>
+                        <Link to="/orders" onClick={() => setOpen(false)} className="block py-2 px-2 text-caption font-graphik text-charcoal hover:bg-cream-paper rounded-md transition-colors">
+                          My Orders
+                        </Link>
+                      </>
+                    )}
+                    {isSeller && (
+                      <Link to="/seller/dashboard" onClick={() => setOpen(false)} className="block py-2 px-2 text-caption font-semibold text-ink-black hover:bg-cream-paper rounded-md transition-colors">
+                        Seller Dashboard
+                      </Link>
+                    )}
+                    {isVerifier && !isAdmin && (
+                      <Link to="/verifier" onClick={() => setOpen(false)} className="block py-2 px-2 text-caption font-semibold text-ink-black hover:bg-cream-paper rounded-md transition-colors">
+                        Verifier Panel
+                      </Link>
+                    )}
+                    {isAdmin && (
+                      <Link to="/admin" onClick={() => setOpen(false)} className="block py-2 px-2 text-caption font-semibold text-ink-black hover:bg-cream-paper rounded-md transition-colors">
+                        Admin Panel
+                      </Link>
+                    )}
+                    <button onClick={() => { handleLogout(); setOpen(false); }} className="w-full text-left py-2 px-2 text-caption font-graphik text-smoke hover:bg-cream-paper rounded-md transition-colors">
+                      Sign Out
+                    </button>
                   </div>
                 )}
               </div>
@@ -250,15 +284,30 @@ const Navbar = () => {
       <div className="hidden md:block bg-pure-white border-b border-ash/40 py-2.5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-6 text-caption font-graphik text-charcoal overflow-x-auto whitespace-nowrap scrollbar-hide py-1">
-            {['Featured', 'New', 'Home Decor', 'Food & Drink', 'Women', 'Beauty & Wellness', 'Jewelry', 'Kids & Baby', 'Men', 'Books'].map((item) => (
-              <Link
-                key={item}
-                to={`/search?category=${encodeURIComponent(item)}`}
-                className="hover:text-ink-black transition-colors"
-              >
-                {item}
-              </Link>
-            ))}
+            {['Featured', 'New', 'Home Decor', 'Food & Drink', 'Women', 'Beauty & Wellness', 'Jewelry', 'Kids & Baby', 'Men', 'Books'].map((item) => {
+              const categorySlugMap = {
+                'Featured': 'featured',
+                'New': 'new',
+                'Home Decor': 'home-decor',
+                'Food & Drink': 'food-drink',
+                'Women': 'women',
+                'Beauty & Wellness': 'beauty-wellness',
+                'Jewelry': 'jewelry',
+                'Kids & Baby': 'kids-baby',
+                'Men': 'men',
+                'Books': 'books'
+              };
+              const slug = categorySlugMap[item] || item.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+              return (
+                <Link
+                  key={item}
+                  to={`/search?category=${encodeURIComponent(slug)}`}
+                  className="hover:text-ink-black transition-colors"
+                >
+                  {item}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </div>
