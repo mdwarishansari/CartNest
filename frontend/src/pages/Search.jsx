@@ -30,6 +30,41 @@ const Search = () => {
     categoryService.getAll().then((res) => setCategories(res.data.categories || [])).catch(() => {});
   }, []);
 
+  // Sync URL search params to filters state
+  useEffect(() => {
+    const q = searchParams.get('q') || '';
+    const categoryParam = searchParams.get('category') || '';
+    const minPrice = searchParams.get('minPrice') || '';
+    const maxPrice = searchParams.get('maxPrice') || '';
+    const sort = searchParams.get('sort') || '-createdAt';
+
+    let resolvedCategory = categoryParam;
+    if (categoryParam && categories.length > 0) {
+      const isObjectId = /^[0-9a-fA-F]{24}$/.test(categoryParam);
+      if (!isObjectId) {
+        const found = categories.find(
+          (c) => c.slug === categoryParam || c.name.toLowerCase() === categoryParam.toLowerCase()
+        );
+        if (found) {
+          resolvedCategory = found._id;
+        }
+      }
+    }
+
+    setFilters((prev) => {
+      if (
+        prev.search === q &&
+        prev.category === resolvedCategory &&
+        prev.minPrice === minPrice &&
+        prev.maxPrice === maxPrice &&
+        prev.sort === sort
+      ) {
+        return prev;
+      }
+      return { search: q, category: resolvedCategory, minPrice, maxPrice, sort };
+    });
+  }, [searchParams, categories]);
+
   // Debounce text/number inputs (search, minPrice, maxPrice) — 500ms
   // Dropdown changes (category, sort) — apply immediately
   useEffect(() => {
@@ -43,7 +78,6 @@ const Search = () => {
       filters.sort !== debouncedFilters.sort;
 
     if (dropdownChanged) {
-      // Apply immediately for dropdown/select changes
       clearTimeout(debounceTimerRef.current);
       setDebouncedFilters({ ...filters });
       return;
@@ -57,9 +91,9 @@ const Search = () => {
     }
 
     return () => clearTimeout(debounceTimerRef.current);
-  }, [filters]);
+  }, [filters, debouncedFilters]);
 
-  // Fetch products when debouncedFilters change
+  // Fetch products and update URL when debouncedFilters change
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
@@ -79,15 +113,38 @@ const Search = () => {
         setLoading(false);
       }
     };
+
     fetchProducts();
-  }, [debouncedFilters]);
+
+    // Update URL query parameters to reflect the debounced filters
+    const newParams = {};
+    if (debouncedFilters.search) newParams.q = debouncedFilters.search;
+    if (debouncedFilters.category) {
+      const cat = categories.find((c) => c._id === debouncedFilters.category);
+      newParams.category = cat ? cat.slug : debouncedFilters.category;
+    }
+    if (debouncedFilters.minPrice) newParams.minPrice = debouncedFilters.minPrice;
+    if (debouncedFilters.maxPrice) newParams.maxPrice = debouncedFilters.maxPrice;
+    if (debouncedFilters.sort && debouncedFilters.sort !== '-createdAt') newParams.sort = debouncedFilters.sort;
+
+    const currentParams = {};
+    searchParams.forEach((value, key) => {
+      currentParams[key] = value;
+    });
+
+    const isDifferent =
+      Object.keys(newParams).length !== Object.keys(currentParams).length ||
+      Object.keys(newParams).some((k) => newParams[k] !== currentParams[k]);
+
+    if (isDifferent) {
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [debouncedFilters, categories, searchParams, setSearchParams]);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // Force immediate apply on Enter
     clearTimeout(debounceTimerRef.current);
     setDebouncedFilters({ ...filters });
-    setSearchParams(filters.search ? { q: filters.search } : {});
   };
 
   const clearFilters = () => {
