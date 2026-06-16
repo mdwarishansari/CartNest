@@ -113,8 +113,8 @@ export const AuthProvider = ({ children }) => {
     refreshUser,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
-    isSeller: user?.role === 'seller',
-    isVerifier: user?.role === 'verifier',
+    isSeller: user?.role === 'seller' || user?.isSeller === true || user?.role === 'admin',
+    isVerifier: user?.role === 'verifier' || user?.role === 'admin',
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
