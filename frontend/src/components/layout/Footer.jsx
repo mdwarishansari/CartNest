@@ -8,7 +8,9 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <Link to="/" className="flex items-center gap-3 mb-4">
-              <img src="/logo.png" alt="CartNest" className="h-9 w-auto object-contain" />
+              <div className="bg-pure-white w-14 h-14 rounded-full flex items-center justify-center p-2.5 shadow-xs shrink-0">
+                <img src="/logo.png" alt="CartNest" className="h-full w-auto object-contain" />
+              </div>
               <span className="text-[20px] font-nantes font-normal tracking-[0.1em] text-pure-white uppercase">CartNest</span>
             </Link>
             <p className="text-caption leading-relaxed text-smoke">A lightweight multi-vendor marketplace for small sellers. Shop unique products, pay securely.</p>
