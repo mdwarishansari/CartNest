@@ -72,6 +72,33 @@ const seedAdmin = async () => {
       }
     }
 
+    // Ensure ALL admin users are also sellers and have a seller profile linked
+    const admins = await User.find({ role: "admin" });
+    for (const adm of admins) {
+      let admProfile = await SellerProfile.findOne({ userId: adm._id });
+      if (!admProfile) {
+        admProfile = await SellerProfile.create({
+          userId: adm._id,
+          userEmail: adm.email,
+          shopName: `${adm.name || "Admin"} Shop`,
+          shopSlug: generateCleanSlug(`${adm.name || "Admin"} Shop`),
+          description: `Official administrative seller profile for ${adm.name || "Admin"}.`,
+          logo: {
+            public_id: "dummy/admin_logo",
+            url: "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=200&q=80",
+          },
+        });
+        console.log(`✅ Created admin seller profile for ${adm.email}`);
+      }
+
+      if (!adm.isSeller || !adm.sellerProfileId) {
+        adm.isSeller = true;
+        adm.sellerProfileId = admProfile._id;
+        await adm.save();
+        console.log(`✅ Linked admin ${adm.email} to seller profile`);
+      }
+    }
+
     // 2. ── Seed Seller User & Profile ──
     const sellerEmail = "seller@cartnest.com";
     let sellerUser = await User.findOne({ email: sellerEmail });
