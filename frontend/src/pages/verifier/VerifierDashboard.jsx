@@ -150,7 +150,7 @@ const VerifierDashboard = () => {
       </motion.div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <StatCard icon={Clock} label="Pending Review" value={stats.pending} />
         <StatCard icon={ShieldCheck} label="Verified" value={stats.verified} />
         <StatCard icon={XCircle} label="Rejected" value={stats.rejected} />
