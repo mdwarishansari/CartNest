@@ -246,8 +246,17 @@ const Home = () => {
                 🛡️ Secure Razorpay Checkout
               </div>
               <div className="flex gap-1.5">
-                <span className="px-2.5 py-1 bg-[#f0f0f0] border border-ash rounded-md text-[9px] font-graphik text-charcoal">Ceramics</span>
-                <span className="px-2.5 py-1 bg-[#f0f0f0] border border-ash rounded-md text-[9px] font-graphik text-charcoal">Decors</span>
+                {categories.slice(0, 2).map((cat) => (
+                  <span key={cat._id} className="px-2.5 py-1 bg-[#f0f0f0] border border-ash rounded-md text-[9px] font-graphik text-charcoal">
+                    {cat.name}
+                  </span>
+                ))}
+                {categories.length === 0 && (
+                  <>
+                    <span className="px-2.5 py-1 bg-[#f0f0f0] border border-ash rounded-md text-[9px] font-graphik text-charcoal">Ceramics</span>
+                    <span className="px-2.5 py-1 bg-[#f0f0f0] border border-ash rounded-md text-[9px] font-graphik text-charcoal">Decors</span>
+                  </>
+                )}
               </div>
             </motion.div>
 
@@ -256,7 +265,7 @@ const Home = () => {
       </section>
 
       {/* ─── Inverted Dark Trust Section ─── */}
-      <section className="bg-ink-black text-pure-white py-16 sm:py-20">
+      <section className="bg-ink-black text-pure-white py-24 sm:py-32">
         <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <div className="max-w-3xl mb-12">
             <div className="w-12 h-[3px] bg-butter-highlight mb-4" />
@@ -277,7 +286,7 @@ const Home = () => {
               <div key={title} className="border-t border-ash/20 pt-6">
                 <Icon className="w-6 h-6 text-butter-highlight mb-4" />
                 <h3 className="text-subheading font-nantes text-pure-white mb-2">{title}</h3>
-                <p className="text-caption font-graphik text-smoke leading-relaxed">{desc}</p>
+                <p className="text-caption font-graphik text-ash leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>
