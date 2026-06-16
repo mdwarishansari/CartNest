@@ -249,7 +249,7 @@ const Navbar = () => {
       {/* Category Links Sub-bar (Desktop only) */}
       <div className="hidden md:block bg-pure-white border-b border-ash/40 py-2.5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center items-center gap-6 text-caption font-graphik text-charcoal">
+          <div className="flex items-center gap-6 text-caption font-graphik text-charcoal overflow-x-auto whitespace-nowrap scrollbar-none py-1">
             {['Featured', 'New', 'Home Decor', 'Food & Drink', 'Women', 'Beauty & Wellness', 'Jewelry', 'Kids & Baby', 'Men', 'Books'].map((item) => (
               <Link
                 key={item}
