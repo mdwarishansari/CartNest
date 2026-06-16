@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Package, ShoppingBag, Users, Tag, MessageSquare, Shield, BarChart3,
   CheckCircle, XCircle, Trash2, Eye, Send, Search, ChevronDown, ChevronUp,
-  Plus, RefreshCw, Mail, Calendar, DollarSign, UserPlus, AlertTriangle
+  Plus, RefreshCw, Mail, Calendar, DollarSign, UserPlus, AlertTriangle, Edit, X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { adminService, categoryService } from '../../services';
@@ -110,6 +110,17 @@ const AdminDashboard = () => {
   // Analytics
   const [reports, setReports] = useState(null);
 
+  // Category edit states
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [editCatName, setEditCatName] = useState('');
+  const [savingCat, setSavingCat] = useState(false);
+
+  // Product edit/view states
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [editForm, setEditForm] = useState({ title: '', description: '', price: '', mrp: '', categoryId: '', stock: '', status: '', tags: '' });
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [viewingProduct, setViewingProduct] = useState(null);
+
   useEffect(() => {
     adminService.getDashboard()
       .then((res) => setStats(res.data))
@@ -180,6 +191,70 @@ const AdminDashboard = () => {
     } catch (err) { toast.error(err.message); }
   };
 
+  const openEditCategory = (cat) => {
+    setEditingCategory(cat);
+    setEditCatName(cat.name);
+  };
+
+  const handleEditCategory = async (e) => {
+    e.preventDefault();
+    if (!editCatName.trim()) return;
+    setSavingCat(true);
+    try {
+      const res = await categoryService.update(editingCategory._id, { name: editCatName.trim() });
+      setCategories(categories.map((c) => c._id === editingCategory._id ? res.data.category : c));
+      setEditingCategory(null);
+      setEditCatName('');
+      toast.success('Category updated');
+    } catch (err) { toast.error(err.message); }
+    finally { setSavingCat(false); }
+  };
+
+  const openEditProduct = (prod) => {
+    setEditingProduct(prod);
+    setEditForm({
+      title: prod.title || '',
+      description: prod.description || '',
+      price: prod.price || '',
+      mrp: prod.mrp || '',
+      categoryId: prod.categoryId?._id || prod.categoryId || '',
+      stock: prod.stock || 0,
+      status: prod.status || 'active',
+      tags: (prod.tags || []).join(', '),
+    });
+  };
+
+  const handleEditProduct = async (e) => {
+    e.preventDefault();
+    setSavingEdit(true);
+    try {
+      const payload = {
+        title: editForm.title,
+        description: editForm.description,
+        price: Number(editForm.price),
+        mrp: Number(editForm.mrp) || Number(editForm.price),
+        categoryId: editForm.categoryId || undefined,
+        stock: Number(editForm.stock),
+        status: editForm.status,
+        tags: editForm.tags ? editForm.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
+      };
+      const res = await adminService.updateProduct(editingProduct._id, payload);
+      setProducts(products.map((p) => p._id === editingProduct._id ? res.data.product : p));
+      setEditingProduct(null);
+      toast.success('Product updated successfully');
+    } catch (err) { toast.error(err.message || 'Failed to update product'); }
+    finally { setSavingEdit(false); }
+  };
+
+  const handleDeleteProduct = async (id) => {
+    if (!confirm('Delete this product?')) return;
+    try {
+      await adminService.deleteProduct(id);
+      setProducts(products.filter((p) => p._id !== id));
+      toast.success('Product deleted successfully');
+    } catch (err) { toast.error(err.message); }
+  };
+
   const handleDeleteUser = async (id) => {
     if (!confirm('Delete this user?')) return;
     try {
@@ -242,7 +317,7 @@ const AdminDashboard = () => {
   const s = stats?.stats || {};
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)] bg-cream-paper font-graphik text-charcoal">
+    <div className="flex min-h-[calc(100vh-80px)] bg-cream-paper font-graphik text-charcoal">
       {/* Sidebar */}
       <aside className="hidden lg:flex flex-col w-64 shrink-0 bg-pure-white border-r border-ash text-charcoal">
         <div className="p-5 border-b border-ash bg-cream-paper">
@@ -379,16 +454,25 @@ const AdminDashboard = () => {
                   </div>
                   <Badge>{prod.verificationState}</Badge>
                   <div className="flex gap-1 shrink-0">
+                    <button onClick={() => setViewingProduct(prod)} className="p-2 text-smoke hover:text-ink-black hover:bg-cream-paper rounded-md transition-colors border border-transparent hover:border-ash" title="View Details">
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => openEditProduct(prod)} className="p-2 text-smoke hover:text-ink-black hover:bg-cream-paper rounded-md transition-colors border border-transparent hover:border-ash" title="Edit Product">
+                      <Edit className="w-4 h-4" />
+                    </button>
                     {prod.verificationState !== 'verified' && (
                       <button onClick={() => handleVerify(prod._id, 'verified')} className="p-2 text-green-700 hover:bg-[#f4f9f4] rounded-md transition-colors border border-transparent hover:border-[#d0e5d2]" title="Approve">
                         <CheckCircle className="w-4 h-4" />
                       </button>
                     )}
                     {prod.verificationState !== 'rejected' && (
-                      <button onClick={() => handleVerify(prod._id, 'rejected')} className="p-2 text-[#7d2d2d] hover:bg-[#fcf5f5] rounded-md transition-colors border border-transparent hover:border-[#f5d5d5]" title="Reject">
+                      <button onClick={() => handleVerify(prod._id, 'rejected')} className="p-2 text-[#8c6d58] hover:bg-[#fbf7f4] rounded-md transition-colors border border-transparent hover:border-[#ebdcd0]" title="Reject">
                         <XCircle className="w-4 h-4" />
                       </button>
                     )}
+                    <button onClick={() => handleDeleteProduct(prod._id)} className="p-2 text-[#7d2d2d] hover:bg-[#fcf5f5] rounded-md transition-colors border border-transparent hover:border-[#f5d5d5]" title="Delete Product">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </motion.div>
               ))}
@@ -549,9 +633,14 @@ const AdminDashboard = () => {
                     <p className="font-semibold text-sm text-ink-black font-graphik">{cat.name}</p>
                     <p className="text-xs text-smoke mt-0.5 font-graphik">/{cat.slug}</p>
                   </div>
-                  <button onClick={() => handleDeleteCategory(cat._id)} className="p-2 text-[#7d2d2d] hover:bg-[#fcf5f5] rounded-md transition-all border border-transparent hover:border-[#f5d5d5]">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="flex gap-1 shrink-0">
+                    <button onClick={() => openEditCategory(cat)} className="p-2 text-smoke hover:text-ink-black hover:bg-cream-paper rounded-md transition-all border border-transparent hover:border-ash" title="Edit">
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDeleteCategory(cat._id)} className="p-2 text-[#7d2d2d] hover:bg-[#fcf5f5] rounded-md transition-all border border-transparent hover:border-[#f5d5d5]" title="Delete">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               ))}
               {categories.length === 0 && <p className="col-span-full text-center py-8 text-smoke">No categories yet</p>}
@@ -735,6 +824,145 @@ const AdminDashboard = () => {
           </div>
         )}
       </main>
+
+      {/* ── Edit Category Modal ── */}
+      <AnimatePresence>
+        {editingCategory && (
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+            <motion.div initial={{ scale: 0.98, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.98, opacity: 0 }}
+              className="bg-pure-white rounded-md border border-ash w-full max-w-md">
+              <div className="flex items-center justify-between p-5 border-b border-ash">
+                <h2 className="font-nantes text-heading-sm text-ink-black">Edit Category</h2>
+                <button onClick={() => setEditingCategory(null)} className="p-2 hover:bg-cream-paper rounded-md transition-colors"><X className="w-5 h-5 text-smoke" /></button>
+              </div>
+              <form onSubmit={handleEditCategory} className="p-5 space-y-4">
+                <div>
+                  <label className="block text-caption font-semibold text-charcoal mb-2">Category Name *</label>
+                  <input value={editCatName} onChange={(e) => setEditCatName(e.target.value)} className={inputCls} required autoFocus />
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <button type="submit" disabled={savingCat}
+                    className="flex-1 py-2.5 bg-ink-black text-pure-white font-semibold rounded-md hover:bg-charcoal transition-all disabled:opacity-60 text-caption cursor-pointer">
+                    {savingCat ? 'Saving...' : 'Save Changes'}
+                  </button>
+                  <button type="button" onClick={() => setEditingCategory(null)}
+                    className="px-6 py-2.5 border border-ash text-charcoal font-semibold rounded-md hover:bg-cream-paper transition-all text-caption cursor-pointer">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── View Product Details Modal ── */}
+      <AnimatePresence>
+        {viewingProduct && (
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+            <motion.div initial={{ scale: 0.98, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.98, opacity: 0 }}
+              className="bg-pure-white rounded-md border border-ash w-full max-w-lg max-h-[90vh] overflow-y-auto p-5 space-y-5">
+              <div className="flex items-center justify-between border-b border-ash pb-3">
+                <h2 className="font-nantes text-heading-sm text-ink-black">Product Details</h2>
+                <button onClick={() => setViewingProduct(null)} className="p-2 hover:bg-cream-paper rounded-md transition-colors"><X className="w-5 h-5 text-smoke" /></button>
+              </div>
+
+              {viewingProduct.images?.length > 0 && (
+                <div className="grid grid-cols-2 gap-2">
+                  {viewingProduct.images.map((img, i) => (
+                    <img key={i} src={img.url} alt="" className="w-full h-40 object-cover rounded-md border border-ash" />
+                  ))}
+                </div>
+              )}
+
+              <div className="space-y-3 font-graphik text-charcoal text-caption">
+                <p><strong>Title:</strong> {viewingProduct.title}</p>
+                <p><strong>Description:</strong> {viewingProduct.description || 'No description'}</p>
+                <p><strong>Price:</strong> ₹{viewingProduct.price?.toLocaleString('en-IN')}</p>
+                <p><strong>MRP:</strong> ₹{viewingProduct.mrp?.toLocaleString('en-IN')}</p>
+                <p><strong>Stock:</strong> {viewingProduct.stock}</p>
+                <p><strong>Category:</strong> {viewingProduct.categoryId?.name || 'Unassigned'}</p>
+                <p><strong>Seller:</strong> {viewingProduct.sellerId?.shopName || viewingProduct.sellerEmail}</p>
+                <p><strong>Verification State:</strong> <Badge>{viewingProduct.verificationState}</Badge></p>
+                <p><strong>Status:</strong> <Badge>{viewingProduct.status}</Badge></p>
+                <p><strong>Tags:</strong> {(viewingProduct.tags || []).join(', ') || 'None'}</p>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Edit Product Modal ── */}
+      <AnimatePresence>
+        {editingProduct && (
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+            <motion.div initial={{ scale: 0.98, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.98, opacity: 0 }}
+              className="bg-pure-white rounded-md border border-ash w-full max-w-lg max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between p-5 border-b border-ash">
+                <h2 className="font-nantes text-heading-sm text-ink-black">Edit Product (Admin)</h2>
+                <button onClick={() => setEditingProduct(null)} className="p-2 hover:bg-cream-paper rounded-md transition-colors"><X className="w-5 h-5 text-smoke" /></button>
+              </div>
+              <form onSubmit={handleEditProduct} className="p-5 space-y-4">
+                <div>
+                  <label className="block text-caption font-semibold text-charcoal mb-2">Title *</label>
+                  <input value={editForm.title} onChange={(e) => setEditForm({ ...editForm, title: e.target.value })} className={inputCls} required />
+                </div>
+                <div>
+                  <label className="block text-caption font-semibold text-charcoal mb-2">Description</label>
+                  <textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} className={`${inputCls} min-h-[80px] resize-y`} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-caption font-semibold text-charcoal mb-2">Price (₹) *</label>
+                    <input type="number" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} className={inputCls} required />
+                  </div>
+                  <div>
+                    <label className="block text-caption font-semibold text-charcoal mb-2">MRP (₹)</label>
+                    <input type="number" value={editForm.mrp} onChange={(e) => setEditForm({ ...editForm, mrp: e.target.value })} className={inputCls} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-caption font-semibold text-charcoal mb-2">Category</label>
+                    <select value={editForm.categoryId} onChange={(e) => setEditForm({ ...editForm, categoryId: e.target.value })} className={inputCls}>
+                      <option value="">Select</option>
+                      {categories.map((cat) => <option key={cat._id} value={cat._id}>{cat.name}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-caption font-semibold text-charcoal mb-2">Stock</label>
+                    <input type="number" value={editForm.stock} onChange={(e) => setEditForm({ ...editForm, stock: e.target.value })} className={inputCls} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-caption font-semibold text-charcoal mb-2">Status</label>
+                    <select value={editForm.status} onChange={(e) => setEditForm({ ...editForm, status: e.target.value })} className={inputCls}>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="deleted">Deleted</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-caption font-semibold text-charcoal mb-2">Tags (comma separated)</label>
+                    <input value={editForm.tags} onChange={(e) => setEditForm({ ...editForm, tags: e.target.value })} className={inputCls} />
+                  </div>
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <button type="submit" disabled={savingEdit}
+                    className="flex-1 py-2.5 bg-ink-black text-pure-white font-semibold rounded-md hover:bg-charcoal transition-all disabled:opacity-60 text-caption cursor-pointer">
+                    {savingEdit ? 'Saving...' : 'Save Changes'}
+                  </button>
+                  <button type="button" onClick={() => setEditingProduct(null)}
+                    className="px-6 py-2.5 border border-ash text-charcoal font-semibold rounded-md hover:bg-cream-paper transition-all text-caption cursor-pointer">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
