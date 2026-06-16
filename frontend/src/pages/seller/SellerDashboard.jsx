@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Package, ShoppingBag, DollarSign, BarChart3, Plus, Trash2, Store, Edit, X, Upload, Save, CheckCircle, Clock, XCircle, Calendar, User, TrendingUp, Percent, Camera, Mail, Phone, ImagePlus, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { sellerService, categoryService, userService } from '../../services';
+import { sellerService, categoryService, userService, productService } from '../../services';
 import { uploadMultipleImages, uploadImage } from '../../services/cloudinary';
 import { useAuth } from '../../context/AuthContext';
 import { PageSpinner } from '../../components/ui/Spinner';
