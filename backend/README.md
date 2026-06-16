@@ -27,7 +27,7 @@ The CartNest backend is a modular **Express.js** REST API that handles:
 
 - **Authentication** — Firebase ID token → JWT session exchange
 - **Multi-Vendor Product Management** — CRUD with Cloudinary image uploads and verification workflows
-- **Shopping Cart** — Price-snapshotted cart items with Redis-backed stock locking
+- **Shopping Cart** — Price-snapshotted cart items with transaction-backed stock verification
 - **Order Lifecycle** — Checkout → Razorpay payment → Fulfillment → Delivery → Returns
 - **Admin Operations** — User management, product moderation, payout tracking
 - **Email Notifications** — Verification emails, contact replies via Nodemailer
@@ -44,7 +44,6 @@ The CartNest backend is a modular **Express.js** REST API that handles:
 | Auth | Firebase Admin SDK + JWT | Token verification and session management |
 | Payments | Razorpay SDK | Order creation and payment verification |
 | File Storage | Cloudinary | Signed image uploads |
-| Cache/Locks | Redis (ioredis) | Distributed locking for stock management |
 | Email | Nodemailer | SMTP email delivery |
 | Validation | express-validator | Request body/params validation |
 | Security | Helmet, CORS | HTTP headers and cross-origin policy |
@@ -79,7 +78,7 @@ Client Request
     → Authorize Middleware (role check)
     → Controller (business logic)
       → Model (MongoDB via Mongoose)
-      → External Services (Cloudinary, Razorpay, Firebase, Redis)
+      → External Services (Cloudinary, Razorpay, Firebase)
   → Error Handler (centralized)
   → JSON Response
 ```
@@ -98,8 +97,7 @@ backend/
 │   │   ├── db.js                     # MongoDB connection
 │   │   ├── firebase.js               # Firebase Admin SDK init
 │   │   ├── cloudinary.js             # Cloudinary config
-│   │   ├── razorpay.js               # Razorpay instance
-│   │   └── redis.js                  # Redis client (ioredis)
+│   │   └── razorpay.js               # Razorpay instance
 │   │
 │   ├── middleware/                    # Express middleware
 │   │   ├── authenticate.js           # JWT token verification
@@ -173,7 +171,6 @@ backend/
 │       ├── ApiError.js               # Custom error class with status codes
 │       ├── asyncHandler.js           # Async middleware wrapper
 │       ├── generateToken.js          # JWT token generation
-│       ├── redisLock.js              # Distributed lock (stock management)
 │       └── slugify.js               # URL-safe slug generator
 │
 ├── .env.example                      # Env variable template
@@ -197,9 +194,8 @@ The server will:
 2. Initialize Firebase Admin SDK
 3. Configure Cloudinary
 4. Initialize Razorpay
-5. Connect to Redis (graceful — won't crash if unavailable)
-6. Seed an admin user if none exists
-7. Start listening on `PORT` (default: 5000)
+5. Seed an admin user if none exists
+6. Start listening on `PORT` (default: 5000)
 
 ---
 
@@ -221,7 +217,6 @@ The server will:
 | `RAZORPAY_KEY_ID` | ✅ | Razorpay key ID |
 | `RAZORPAY_KEY_SECRET` | ✅ | Razorpay key secret |
 | `RAZORPAY_WEBHOOK_SECRET` | ❌ | Razorpay webhook secret |
-| `REDIS_URL` | ❌ | Redis connection URL |
 | `SMTP_HOST` | ✅ | SMTP server host (e.g., `smtp.gmail.com`) |
 | `SMTP_PORT` | ✅ | SMTP port (e.g., `587`) |
 | `SMTP_USER` | ✅ | SMTP username/email |
@@ -391,7 +386,6 @@ The server will:
 | `ApiError` | `ApiError.js` | Custom error class with factory methods (`badRequest`, `notFound`, `unauthorized`, `forbidden`) |
 | `asyncHandler` | `asyncHandler.js` | Wraps async route handlers to catch promise rejections |
 | `generateToken` | `generateToken.js` | Create JWT tokens with configurable expiry |
-| `redisLock` | `redisLock.js` | Acquire/release distributed Redis locks for stock management |
 | `slugify` | `slugify.js` | Generate unique URL-safe slugs with collision handling |
 
 ---

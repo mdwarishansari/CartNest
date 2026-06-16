@@ -35,62 +35,60 @@ const ProductCard = ({ product }) => {
       initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      whileHover={{ y: -4 }}
       transition={{ duration: 0.3 }}
-      className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden group"
+      className="bg-pure-white rounded-md border border-ash transition-all duration-300 overflow-hidden group relative"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
       {/* Image */}
-      <Link to={`/product/${product.slug}`} className="block relative overflow-hidden aspect-square bg-gray-50">
-        {/* Show current image with fade */}
+      <Link to={`/product/${product.slug}`} className="block relative overflow-hidden aspect-square bg-cream-paper border-b border-ash/40">
         <img
           src={allImages[currentIdx]?.url}
           alt={product.title}
-          className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
           style={{ opacity: 1 }}
           loading="lazy"
         />
 
         {discount > 0 && (
-          <span className="absolute top-3 left-3 px-2.5 py-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-lg shadow-md">
+          <span className="absolute top-2 left-2 px-2 py-0.5 bg-butter-highlight text-ink-black text-[10px] font-semibold border border-ink-black/10 rounded-md">
             -{discount}%
           </span>
         )}
         {!product.verified && (
-          <span className="absolute top-3 right-3 px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-semibold rounded-lg">Pending</span>
+          <span className="absolute top-2 right-2 px-2 py-0.5 bg-cream-paper text-smoke text-[10px] font-semibold border border-ash rounded-md">Pending</span>
         )}
 
         {/* Hover overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
-          <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold text-gray-700 shadow-lg flex items-center gap-2">
-            <Eye className="w-4 h-4" /> Quick View
+        <div className="absolute inset-0 bg-ink-black/0 group-hover:bg-ink-black/5 transition-colors duration-300 flex items-center justify-center">
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-pure-white px-3 py-1.5 rounded-3xl text-[12px] font-graphik text-charcoal border border-ash flex items-center gap-1.5">
+            <Eye className="w-4 h-4 text-smoke" /> Quick View
           </span>
         </div>
 
         {/* Image dots */}
         {allImages.length > 1 && (
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             {allImages.map((_, i) => (
-              <span key={i} className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentIdx ? 'bg-indigo-500 w-3' : 'bg-white/80'}`} />
+              <span key={i} className={`w-1 h-1 rounded-full transition-all duration-300 ${i === currentIdx ? 'bg-ink-black w-2' : 'bg-ash'}`} />
             ))}
           </div>
         )}
       </Link>
 
       {/* Info */}
-      <div className="p-4">
+      <div className="p-4 font-graphik">
         {product.sellerId?.shopName && (
-          <p className="text-xs font-medium text-indigo-600 mb-1.5 truncate">{product.sellerId.shopName}</p>
+          <p className="text-[10px] font-normal text-smoke mb-1.5 truncate uppercase tracking-widest">{product.sellerId.shopName}</p>
         )}
         <Link to={`/product/${product.slug}`}>
-          <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 hover:text-indigo-600 transition-colors leading-snug mb-3">{product.title}</h3>
+          <h3 className="text-caption font-normal text-charcoal line-clamp-2 hover:text-ink-black transition-colors leading-snug mb-3">{product.title}</h3>
         </Link>
-        <div className="flex items-end justify-between">
+        <div className="flex items-center justify-between mt-auto">
           <div>
-            <span className="text-lg font-bold text-gray-900">₹{product.price?.toLocaleString('en-IN')}</span>
+            <span className="text-body font-normal text-ink-black">₹{product.price?.toLocaleString('en-IN')}</span>
             {product.mrp && product.mrp > product.price && (
-              <span className="text-sm text-gray-400 line-through ml-2">₹{product.mrp?.toLocaleString('en-IN')}</span>
+              <span className="text-caption text-smoke line-through ml-2">₹{product.mrp?.toLocaleString('en-IN')}</span>
             )}
           </div>
           {showCartButton && (
@@ -103,10 +101,10 @@ const ProductCard = ({ product }) => {
                 }
                 addToCart(product._id, 1);
               }}
-              className="p-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95"
+              className="p-2 bg-ink-black hover:bg-charcoal text-pure-white rounded-md transition-all active:scale-95"
               title="Add to Cart"
             >
-              <ShoppingCart className="w-4 h-4" />
+              <ShoppingCart className="w-3.5 h-3.5" />
             </button>
           )}
         </div>

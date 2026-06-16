@@ -30,78 +30,172 @@ const Home = () => {
   }, []);
 
   return (
-    <div>
-      {/* ─── Hero ─── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white">
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
-          <div className="absolute top-10 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-300/10 rounded-full blur-3xl" />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 py-20 sm:py-28 lg:py-32 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-2xl"
-          >
+    <div className="bg-cream-paper min-h-screen">
+      {/* ─── Hero Section ─── */}
+      <section className="relative overflow-hidden bg-cream-paper border-b border-ash py-16 sm:py-24 lg:py-28">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:grid lg:grid-cols-12 lg:gap-12 items-center">
+          
+          {/* Left Column: Editorial Headline & Actions */}
+          <div className="lg:col-span-6 max-w-2xl">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/15 backdrop-blur-sm rounded-full text-sm font-medium mb-6 border border-white/20"
+              transition={{ delay: 0.1 }}
+              className="inline-flex items-center gap-2 px-3 py-1 bg-pure-white border border-ash rounded-3xl text-caption font-graphik text-charcoal mb-6"
             >
-              <Sparkles className="w-4 h-4 text-yellow-300" />
-              Trusted by 100+ Local Sellers
+              <Sparkles className="w-4 h-4 text-ink-black fill-butter-highlight" />
+              <span className="tracking-wide">Trusted by 100+ Local Sellers</span>
             </motion.div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] mb-6 tracking-tight">
-              Discover Amazing Products from{' '}
-              <span className="text-yellow-300">Local Sellers</span>
+            <h1 className="text-display sm:text-[42px] lg:text-[52px] font-nantes text-ink-black leading-[1.2] mb-6">
+              Discover Unique Products from{' '}
+              <span className="relative inline-block">
+                Local Artisans
+                <span className="absolute bottom-1.5 left-0 w-full h-[3px] bg-butter-highlight -z-10" />
+              </span>
             </h1>
-            <p className="text-lg sm:text-xl text-indigo-100 mb-10 leading-relaxed max-w-lg">
-              Browse unique products, pay securely with Razorpay, and support small businesses.
+            
+            <p className="text-body font-graphik text-charcoal mb-10 leading-relaxed max-w-lg">
+              Browse unique wholesale catalog styles, pay securely with Razorpay, and support active local marketplaces.
             </p>
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 0.3 }}
               className="flex flex-wrap gap-4"
             >
               <Link
                 to="/search"
-                className="inline-flex items-center gap-2 px-7 py-3.5 bg-white text-indigo-700 font-bold rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all text-base"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-ink-black text-pure-white font-graphik rounded-md hover:bg-charcoal transition-all text-caption"
               >
-                Browse Products <ArrowRight className="w-5 h-5" />
+                Browse Products <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 to="/seller/signup"
-                className="inline-flex items-center gap-2 px-7 py-3.5 bg-white/10 text-white border border-white/30 font-semibold rounded-xl hover:bg-white/20 backdrop-blur-sm transition-all text-base"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-pure-white text-ink-black border border-ash font-graphik rounded-md hover:bg-cream-paper transition-all text-caption"
               >
                 Become a Seller
               </Link>
             </motion.div>
-          </motion.div>
+          </div>
+
+          {/* Right Column: Layered Custom UI Cards Composition (Interactive, No Photography) */}
+          <div className="hidden lg:col-span-6 lg:flex relative justify-center items-center h-[420px]">
+            {/* Background decorative shape */}
+            <div className="absolute w-72 h-72 rounded-full border border-ash/60 bg-cream-paper/40 -z-10" />
+
+            {/* 1. Featured Product Card */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              whileHover={{ y: -5 }}
+              className="absolute w-60 bg-pure-white border border-ash rounded-md p-3 z-10"
+              style={{ transform: 'rotate(-2deg)' }}
+            >
+              <div className="aspect-square bg-cream-paper rounded-md overflow-hidden relative mb-2.5">
+                {/* SVG mock illustration representing a ceramic vase */}
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-b from-[#e3ded9] to-[#c7c0b7] p-8">
+                  <svg viewBox="0 0 100 100" className="w-24 h-24 text-charcoal/30">
+                    <path d="M50,15 C45,15 40,25 40,40 C40,55 30,60 30,75 C30,85 70,85 70,75 C70,60 60,55 60,40 C60,25 55,15 50,15 Z" fill="#eae6e1" stroke="#333" strokeWidth="1" />
+                    <line x1="30" y1="75" x2="70" y2="75" stroke="#333" strokeWidth="1" />
+                    <ellipse cx="50" cy="15" rx="10" ry="3" fill="#ffffff" stroke="#333" strokeWidth="1" />
+                  </svg>
+                </div>
+                <span className="absolute top-2 left-2 px-1.5 py-0.5 bg-butter-highlight text-[8px] font-semibold border border-ink-black/10 rounded-md">Featured</span>
+              </div>
+              <div className="font-graphik text-[10px] text-smoke uppercase tracking-wider mb-0.5">Studio Clay</div>
+              <h3 className="font-graphik text-caption font-normal text-charcoal truncate mb-2">Artisan Ceramic Vase</h3>
+              <div className="flex justify-between items-center">
+                <span className="text-caption font-semibold text-ink-black">₹2,400</span>
+                <span className="p-1 px-2 border border-ash rounded-md text-[10px] font-graphik font-semibold">View</span>
+              </div>
+            </motion.div>
+
+            {/* 2. Seller Rating Card */}
+            <motion.div
+              initial={{ opacity: 0, x: 50, y: -40 }}
+              animate={{ opacity: 1, x: 0, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              whileHover={{ scale: 1.03 }}
+              className="absolute top-10 right-2 w-48 bg-pure-white border border-ash rounded-md p-3.5 z-20"
+              style={{ transform: 'rotate(4deg)' }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-7 h-7 rounded-full bg-ink-black flex items-center justify-center text-pure-white text-xs font-bold font-graphik">S</div>
+                <div>
+                  <h4 className="font-graphik text-[11px] font-semibold text-ink-black">Studio Clay</h4>
+                  <p className="text-[9px] text-smoke">New Delhi, IN</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 border-t border-ash/60 pt-2">
+                <span className="text-caption font-bold text-ink-black">4.9</span>
+                <span className="text-[#e2a000] text-[10px]">★★★★★</span>
+                <span className="text-[10px] text-smoke">(84)</span>
+              </div>
+              <span className="inline-block mt-2 px-2 py-0.5 text-[8px] font-semibold uppercase rounded-3xl bg-[#f2fcf5] text-green-700 border border-green-200">
+                Verified Seller
+              </span>
+            </motion.div>
+
+            {/* 3. Orders Statistics Card */}
+            <motion.div
+              initial={{ opacity: 0, x: -50, y: 40 }}
+              animate={{ opacity: 1, x: 0, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+              whileHover={{ scale: 1.03 }}
+              className="absolute bottom-12 left-2 w-44 bg-pure-white border border-ash rounded-md p-3.5 z-20"
+              style={{ transform: 'rotate(-5deg)' }}
+            >
+              <div className="text-[10px] font-graphik text-smoke uppercase tracking-wider mb-0.5">Marketplace Stats</div>
+              <div className="text-heading font-nantes text-ink-black mb-1">12K+</div>
+              <div className="text-[9px] font-graphik text-smoke leading-tight">Artisan products shipped worldwide this month</div>
+            </motion.div>
+
+            {/* 4. Category Chips & Secure Payment Tag */}
+            <motion.div
+              initial={{ opacity: 0, y: 60 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="absolute bottom-6 right-12 flex flex-col items-end gap-2 z-20"
+            >
+              <div className="px-3 py-1 bg-pure-white border border-ash rounded-md text-[10px] font-graphik text-charcoal">
+                🛡️ Secure Razorpay Checkout
+              </div>
+              <div className="flex gap-1.5">
+                <span className="px-2.5 py-1 bg-[#f0f0f0] border border-ash rounded-md text-[9px] font-graphik text-charcoal">Ceramics</span>
+                <span className="px-2.5 py-1 bg-[#f0f0f0] border border-ash rounded-md text-[9px] font-graphik text-charcoal">Decors</span>
+              </div>
+            </motion.div>
+
+          </div>
         </div>
       </section>
 
-      {/* ─── Stats ─── */}
-      <section className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 stagger-children">
+      {/* ─── Inverted Dark Trust Section ─── */}
+      <section className="bg-ink-black text-pure-white py-16 sm:py-20">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8">
+          <div className="max-w-3xl mb-12">
+            <div className="w-12 h-[3px] bg-butter-highlight mb-4" />
+            <h2 className="text-heading sm:text-heading-lg lg:text-[38px] font-nantes text-pure-white leading-[1.27] mb-4">
+              Get your products in front of buyers or find verified local suppliers.
+            </h2>
+            <p className="text-body font-graphik text-ash leading-relaxed">
+              CartNest provides a quiet, editorial digital catalog for merchants to transact safely, build relationships, and scale local communities.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             {[
-              { icon: Store, label: 'Verified Sellers', value: 'Growing Network', color: 'bg-indigo-100 text-indigo-600' },
-              { icon: ShieldCheck, label: 'Secure Payments', value: 'Powered by Razorpay', color: 'bg-green-100 text-green-600' },
-              { icon: Truck, label: 'Fast Delivery', value: 'Best Prices Guaranteed', color: 'bg-amber-100 text-amber-600' },
-            ].map(({ icon: Icon, label, value, color }) => (
-              <div key={label} className="flex items-center gap-4 p-5 rounded-xl bg-gray-50 hover:bg-white hover:shadow-md transition-all duration-300">
-                <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center shrink-0`}>
-                  <Icon className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-gray-900">{value}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{label}</p>
-                </div>
+              { icon: Store, title: 'Verified Artisan Networks', desc: 'Every seller is verified by our inspection team to guarantee quality wholesale production.' },
+              { icon: ShieldCheck, title: 'Secure Razorpay Payments', desc: 'All transactions are secure and backed by our merchant trade protection policy.' },
+              { icon: Truck, title: 'Optimized Trade Logistics', desc: 'Get direct-from-artisan pricing with direct billing, clear shipping tracking, and support.' },
+            ].map(({ icon: Icon, title, desc }) => (
+              <div key={title} className="border-t border-ash/20 pt-6">
+                <Icon className="w-6 h-6 text-butter-highlight mb-4" />
+                <h3 className="text-subheading font-nantes text-pure-white mb-2">{title}</h3>
+                <p className="text-caption font-graphik text-smoke leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>
@@ -110,17 +204,19 @@ const Home = () => {
 
       {/* ─── Categories ─── */}
       {categories.length > 0 && (
-        <section className="py-12">
+        <section className="py-16">
           <div className="max-w-7xl mx-auto px-6 sm:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
+              className="relative mb-8"
             >
-              <h2 className="text-2xl sm:text-3xl font-bold mb-2">Shop by Category</h2>
-              <p className="text-gray-500 text-sm mb-6">Find products in your favorite categories</p>
+              <div className="w-12 h-[3px] bg-butter-highlight mb-2" />
+              <h2 className="text-heading sm:text-heading-lg font-nantes text-ink-black">Shop by Category</h2>
+              <p className="text-smoke text-caption mt-1">Find products in your favorite categories</p>
             </motion.div>
-            <div className="flex gap-3 overflow-x-auto pb-3 scrollbar-hide">
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
               {categories.map((cat, i) => (
                 <motion.div
                   key={cat._id}
@@ -131,7 +227,7 @@ const Home = () => {
                 >
                   <Link
                     to={`/category/${cat.slug}`}
-                    className="block shrink-0 px-6 py-3.5 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 hover:border-indigo-400 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 text-sm font-semibold text-indigo-700 whitespace-nowrap"
+                    className="block shrink-0 px-6 py-3 rounded-3xl bg-pure-white border border-charcoal text-caption font-graphik text-ink-black hover:bg-ink-black hover:text-pure-white transition-all whitespace-nowrap"
                   >
                     {cat.name}
                   </Link>
@@ -143,19 +239,20 @@ const Home = () => {
       )}
 
       {/* ─── Featured Products ─── */}
-      <section className="py-12 bg-white">
+      <section className="py-16 bg-pure-white border-t border-ash">
         <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex items-center justify-between mb-8"
+            className="flex items-end justify-between mb-10"
           >
             <div>
-              <h2 className="text-2xl sm:text-3xl font-bold">Featured Products</h2>
-              <p className="text-gray-500 text-sm mt-1">Hand-picked products just for you</p>
+              <div className="w-12 h-[3px] bg-butter-highlight mb-2" />
+              <h2 className="text-heading sm:text-heading-lg font-nantes text-ink-black">Featured Products</h2>
+              <p className="text-smoke text-caption mt-1">Hand-picked products just for you</p>
             </div>
-            <Link to="/search" className="text-indigo-600 text-sm font-semibold hover:text-indigo-800 inline-flex items-center gap-1 transition-colors">
+            <Link to="/search" className="text-charcoal text-caption font-graphik hover:text-ink-black hover:underline inline-flex items-center gap-1 transition-colors">
               View All <ArrowRight className="w-4 h-4" />
             </Link>
           </motion.div>
@@ -168,19 +265,17 @@ const Home = () => {
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center text-center py-16 animate-fade-in">
-              <Package className="w-16 h-16 text-gray-300 mb-4" />
-              <p className="text-lg font-semibold text-gray-600 mb-2">No products yet</p>
-              <p className="text-sm text-gray-400 max-w-sm mb-6">Products will appear here once sellers add them and they get verified.</p>
-              <Link to="/seller/signup" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
+            <div className="flex flex-col items-center justify-center text-center py-16 animate-fade-in font-graphik border border-dashed border-ash rounded-md bg-cream-paper">
+              <Package className="w-12 h-12 text-smoke mb-4" />
+              <p className="text-subheading font-normal text-charcoal mb-2">No products yet</p>
+              <p className="text-caption text-smoke max-w-sm mb-6">Products will appear here once sellers add them and they get verified.</p>
+              <Link to="/seller/signup" className="inline-flex items-center gap-2 px-5 py-2.5 bg-ink-black text-pure-white font-semibold rounded-md hover:bg-charcoal transition-all text-caption">
                 <Store className="w-4 h-4" /> Start Selling
               </Link>
             </div>
           )}
         </div>
       </section>
-
-      
     </div>
   );
 };

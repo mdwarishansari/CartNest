@@ -4,7 +4,6 @@ const Cart = require("../cart/cart.model");
 const Product = require("../product/product.model");
 const SellerProfile = require("../seller/sellerProfile.model");
 const { getRazorpay } = require("../../config/razorpay");
-const { withLock } = require("../../utils/redisLock");
 const asyncHandler = require("../../utils/asyncHandler");
 const ApiError = require("../../utils/ApiError");
 
@@ -73,20 +72,17 @@ const checkout = asyncHandler(async (req, res) => {
     for (const item of cart.items) {
       const product = item.productId;
 
-      // Use Redis lock for extra safety
-      await withLock(`lock:product:${product._id}`, async () => {
-        const result = await Product.findOneAndUpdate(
-          { _id: product._id, stock: { $gte: item.qty } },
-          { $inc: { stock: -item.qty, reserved: item.qty } },
-          { session, new: true },
-        );
+      const result = await Product.findOneAndUpdate(
+        { _id: product._id, stock: { $gte: item.qty } },
+        { $inc: { stock: -item.qty, reserved: item.qty } },
+        { session, new: true },
+      );
 
-        if (!result) {
-          throw ApiError.badRequest(
-            `Failed to reserve stock for "${product.title}"`,
-          );
-        }
-      });
+      if (!result) {
+        throw ApiError.badRequest(
+          `Failed to reserve stock for "${product.title}"`,
+        );
+      }
     }
 
     // Create order document

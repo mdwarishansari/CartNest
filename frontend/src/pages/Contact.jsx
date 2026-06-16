@@ -22,19 +22,18 @@ const Contact = () => {
 
   if (submitted) {
     return (
-      <div className="flex items-center justify-center min-h-[70vh] px-4">
+      <div className="flex items-center justify-center min-h-[70vh] px-4 bg-cream-paper font-graphik">
         <motion.div
-          initial={{ scale: 0.5, opacity: 0 }}
+          initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 150 }}
-          className="text-center max-w-md"
+          className="text-center max-w-md bg-pure-white border border-ash rounded-md p-8"
         >
-          <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-            <CheckCircle2 className="w-10 h-10 text-green-600" />
+          <div className="w-12 h-12 rounded-full bg-cream-paper border border-ash flex items-center justify-center mx-auto mb-6">
+            <CheckCircle2 className="w-6 h-6 text-smoke" />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">Thank You!</h2>
-          <p className="text-gray-500 mb-8 leading-relaxed">Your message has been sent successfully. We&apos;ll get back to you soon.</p>
-          <button onClick={() => { setSubmitted(false); setForm({ fromName: '', fromEmail: '', subject: '', message: '' }); }} className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all">
+          <h2 className="text-heading font-nantes text-ink-black mb-3">Thank You</h2>
+          <p className="text-caption text-smoke mb-8 leading-relaxed">Your message has been sent successfully. We&apos;ll get back to you soon.</p>
+          <button onClick={() => { setSubmitted(false); setForm({ fromName: '', fromEmail: '', subject: '', message: '' }); }} className="inline-flex items-center gap-2 px-5 py-2.5 bg-ink-black text-pure-white font-semibold rounded-md hover:bg-charcoal transition-all cursor-pointer text-caption">
             <Send className="w-4 h-4" /> Send Another Message
           </button>
         </motion.div>
@@ -42,51 +41,46 @@ const Contact = () => {
     );
   }
 
-  const inputCls = "w-full px-4 py-3 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all";
+  const inputCls = "w-full px-3 py-2 text-caption border border-ash rounded-md bg-pure-white focus:border-ink-black outline-none transition-all font-graphik text-charcoal placeholder:text-smoke";
 
   return (
-    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-12 bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/30">
+    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-12 bg-cream-paper font-graphik">
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.4 }}
         className="w-full max-w-lg"
       >
         {/* Header */}
         <div className="text-center mb-8">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
-            className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-blue-200"
-          >
-            <MessageSquare className="w-8 h-8 text-white" />
-          </motion.div>
-          <h1 className="text-3xl font-extrabold gradient-text mb-2">Contact Us</h1>
-          <p className="text-gray-500 text-sm">Have a question or need help? Drop us a message.</p>
+          <div className="w-12 h-12 rounded-full bg-pure-white border border-ash flex items-center justify-center mx-auto mb-4 shadow-none">
+            <MessageSquare className="w-6 h-6 text-smoke" />
+          </div>
+          <h1 className="text-heading sm:text-heading-lg font-nantes text-ink-black mb-2">Contact Us</h1>
+          <p className="text-caption text-smoke">Have a question or need help? Drop us a message.</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-7 sm:p-8">
+        <div className="bg-pure-white rounded-md border border-ash p-7 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Name</label>
+                <label className="block text-caption font-semibold text-charcoal mb-2">Name</label>
                 <input value={form.fromName} onChange={(e) => setForm({ ...form, fromName: e.target.value })} className={inputCls} placeholder="Your name" required />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                <label className="block text-caption font-semibold text-charcoal mb-2">Email</label>
                 <input type="email" value={form.fromEmail} onChange={(e) => setForm({ ...form, fromEmail: e.target.value })} className={inputCls} placeholder="you@example.com" required />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Subject</label>
+              <label className="block text-caption font-semibold text-charcoal mb-2">Subject</label>
               <input value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} className={inputCls} placeholder="What's this about?" required />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Message</label>
+              <label className="block text-caption font-semibold text-charcoal mb-2">Message</label>
               <textarea
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
@@ -96,13 +90,13 @@ const Contact = () => {
               />
             </div>
 
-            <button type="submit" disabled={loading} className="w-full py-3 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-indigo-200 hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-60 mt-2">
+            <button type="submit" disabled={loading} className="w-full py-3 px-6 bg-ink-black text-pure-white font-semibold rounded-md hover:bg-charcoal transition-all disabled:opacity-60 mt-2 cursor-pointer text-caption">
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Sending...
+                  <span className="w-4 h-4 border-2 border-pure-white/30 border-t-pure-white rounded-full animate-spin" />Sending...
                 </span>
               ) : (
-                <span className="flex items-center justify-center gap-2"><Send className="w-5 h-5" /> Send Message</span>
+                <span className="flex items-center justify-center gap-2"><Send className="w-4 h-4" /> Send Message</span>
               )}
             </button>
           </form>

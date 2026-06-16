@@ -89,7 +89,7 @@ The platform supports **four distinct user roles** (Customer, Seller, Admin, Ver
 
 - **Firebase Authentication** — Secure sign-up/login with email verification
 - **Cloudinary CDN** — Signed image uploads for products and shop logos
-- **Redis Caching** — Optimized stock locking with distributed locks
+- **Stock Validation** — Optimized stock locking with transaction-backed controls
 - **Role-Based Auth** — JWT tokens with middleware-enforced access control
 - **Responsive Design** — Mobile-first UI with Framer Motion animations
 - **API Security** — Helmet, CORS, express-validator, and async error handling
@@ -106,7 +106,6 @@ The platform supports **four distinct user roles** (Customer, Seller, Admin, Ver
 | **Auth**     | Firebase Authentication (Client) + Firebase Admin SDK (Server) + JWT    |
 | **Payments** | Razorpay (Order creation + Payment verification + Webhook support)      |
 | **Storage**  | Cloudinary (Signed uploads for product images & shop logos)             |
-| **Cache**    | Redis / Upstash (Distributed locking for stock management)              |
 | **Email**    | Nodemailer (SMTP — Gmail App Passwords or SendGrid)                     |
 | **Styling**  | Tailwind CSS 4 + custom CSS animations + Framer Motion                  |
 
@@ -137,12 +136,12 @@ The platform supports **four distinct user roles** (Customer, Seller, Admin, Ver
 │  │ Seller│ │ Admin │ │Payment│ │Contact │ │ Cloudinary  │   │
 │  │Module │ │Module │ │Module │ │Module  │ │  Module     │   │
 │  └───────┘ └───────┘ └───────┘ └────────┘ └─────────────┘   │
-└───────┬──────────────┬────────────────┬──────────────────────┘
-        │              │                │
-   ┌────▼────┐   ┌─────▼─────┐   ┌─────▼────┐
-   │ MongoDB │   │   Redis   │   │Cloudinary│
-   │  Atlas  │   │(Upstash)  │   │   CDN    │
-   └─────────┘   └───────────┘   └──────────┘
+└───────┬───────────────────────────────┬──────────────────────┘
+        │                               │
+   ┌────▼────┐                     ┌────▼─────┐
+   │ MongoDB │                     │Cloudinary│
+   │  Atlas  │                     │   CDN    │
+   └─────────┘                     └──────────┘
 ```
 
 ---
@@ -155,7 +154,7 @@ CartNest/
 │   ├── src/
 │   │   ├── app.js             # Express app setup (CORS, middleware, routes)
 │   │   ├── server.js          # Server entry point (service initialization)
-│   │   ├── config/            # DB, Firebase, Cloudinary, Razorpay, Redis configs
+│   │   ├── config/            # DB, Firebase, Cloudinary, Razorpay configs
 │   │   ├── middleware/        # authenticate, authorize, validate, errorHandler
 │   │   ├── modules/           # Feature modules (MVC per module)
 │   │   │   ├── auth/          # Firebase session → JWT token exchange
@@ -219,7 +218,6 @@ CartNest/
 - **Firebase** — [Firebase Console](https://console.firebase.google.com) (Authentication enabled)
 - **Cloudinary** — [Cloudinary Dashboard](https://console.cloudinary.com)
 - **Razorpay** — [Razorpay Dashboard](https://dashboard.razorpay.com) (test keys for development)
-- **Redis** _(optional)_ — [Upstash](https://upstash.com) or local Redis
 
 ### Installation
 
