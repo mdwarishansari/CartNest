@@ -74,7 +74,7 @@ const Login = () => {
   };
 
   return (
-    <div className="bg-cream-paper min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-12 font-graphik">
+    <div className="bg-cream-paper min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-12 font-graphik">
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}

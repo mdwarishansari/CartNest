@@ -44,7 +44,7 @@ const Contact = () => {
   const inputCls = "w-full px-3 py-2 text-caption border border-ash rounded-md bg-pure-white focus:border-ink-black outline-none transition-all font-graphik text-charcoal placeholder:text-smoke";
 
   return (
-    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-12 bg-cream-paper font-graphik">
+    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-12 bg-cream-paper font-graphik">
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}

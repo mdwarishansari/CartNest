@@ -134,7 +134,7 @@ const VerifierDashboard = () => {
   ];
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 font-graphik text-charcoal min-h-[calc(100vh-64px)]">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 font-graphik text-charcoal min-h-[calc(100vh-80px)]">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
         <div className="flex items-center gap-3 mb-2">
