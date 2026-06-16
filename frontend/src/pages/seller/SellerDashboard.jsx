@@ -307,7 +307,7 @@ const SellerDashboard = () => {
                 </div>
                 <h4 className="font-nantes text-heading-sm text-ink-black">Earnings Breakdown</h4>
               </div>
-              <div className="grid grid-cols-3 gap-3 text-center">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
                 <div className="bg-cream-paper border border-ash rounded-md p-3">
                   <p className="text-caption font-bold text-ink-black">₹{(stats.totalSales || 0).toLocaleString('en-IN')}</p>
                   <p className="text-[10px] text-smoke font-semibold uppercase tracking-wider">Gross Sales</p>
