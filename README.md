@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="frontend/public/logo.png" alt="CartNest Logo" width="120" />
+  <img src="client/public/logo.png" alt="CartNest Logo" width="120" />
 </p>
 
 <h1 align="center">🛒 CartNest</h1>
