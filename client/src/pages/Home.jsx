@@ -56,7 +56,7 @@ const Home = () => {
       {loading ? (
         <HeroSkeleton />
       ) : (
-        <section className="relative overflow-hidden bg-cream-paper border-b border-ash pt-7 pb-14 sm:pt-12 sm:pb-24 lg:pt-14 lg:pb-28">
+        <section className="relative overflow-hidden bg-cream-paper border-b border-ash pt-2 pb-14 sm:pt-3 sm:pb-24 lg:pt-4 lg:pb-28">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:grid lg:grid-cols-12 lg:gap-12 items-center">
           
           {/* Left Column: Editorial Headline & Actions */}

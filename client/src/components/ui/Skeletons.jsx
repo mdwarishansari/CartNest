@@ -295,7 +295,7 @@ export const CheckoutSkeleton = () => (
 
 // 10. HeroSkeleton
 export const HeroSkeleton = () => (
-  <div className="relative overflow-hidden bg-cream-paper border-b border-ash pt-10 pb-20 lg:pt-14 lg:pb-28">
+  <div className="relative overflow-hidden bg-cream-paper border-b border-ash pt-2 pb-14 sm:pt-3 sm:pb-24 lg:pt-4 lg:pb-28">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         {/* Content column */}

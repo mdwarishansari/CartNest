@@ -150,7 +150,7 @@ The platform supports **four distinct user roles** (Customer, Seller, Admin, Ver
 
 ```
 CartNest/
-├── backend/                   # Express API server
+├── server/                    # Express API server
 │   ├── src/
 │   │   ├── app.js             # Express app setup (CORS, middleware, routes)
 │   │   ├── server.js          # Server entry point (service initialization)
@@ -169,10 +169,10 @@ CartNest/
 │   │   │   ├── contact/       # Contact form submissions
 │   │   │   └── cloudinary/    # Signed upload signatures
 │   │   └── utils/             # ApiError, asyncHandler, generateToken, slugify
-│   ├── .env.example           # Backend env template
+│   ├── .env.example           # Server env template
 │   └── package.json
 │
-├── frontend/                  # React SPA (Vite)
+├── client/                    # React SPA (Vite)
 │   ├── src/
 │   │   ├── App.jsx            # Router + Layout + Providers
 │   │   ├── main.jsx           # Entry point
@@ -198,7 +198,7 @@ CartNest/
 │   │       ├── seller/        # SellerSignup, SellerDashboard
 │   │       ├── admin/         # AdminDashboard
 │   │       └── verifier/      # VerifierDashboard
-│   ├── .env.example           # Frontend env template
+│   ├── .env.example           # Client env template
 │   └── package.json
 │
 ├── DEPLOYMENT.md              # Production deployment guide
@@ -226,13 +226,13 @@ CartNest/
 git clone https://github.com/yourusername/CartNest.git
 cd CartNest
 
-# Install backend dependencies
-cd backend
+# Install server dependencies
+cd server
 cp .env.example .env     # Fill in your keys
 npm install
 
-# Install frontend dependencies
-cd ../frontend
+# Install client dependencies
+cd ../client
 cp .env.example .env     # Fill in your keys
 npm install
 ```
@@ -240,12 +240,12 @@ npm install
 ### Running Locally
 
 ```bash
-# Terminal 1 — Start backend (port 5000)
-cd backend
+# Terminal 1 — Start server (port 5000)
+cd server
 npm run dev
 
-# Terminal 2 — Start frontend (port 5173)
-cd frontend
+# Terminal 2 — Start client (port 5173)
+cd client
 npm run dev
 ```
 
@@ -259,14 +259,14 @@ See the detailed `.env.example` files in each directory:
 
 | File                                             | Description                                                     |
 | ------------------------------------------------ | --------------------------------------------------------------- |
-| [`backend/.env.example`](backend/.env.example)   | MongoDB, JWT, Firebase Admin, Cloudinary, Razorpay, Redis, SMTP |
-| [`frontend/.env.example`](frontend/.env.example) | API URL, Firebase Client, Cloudinary, Razorpay key              |
+| [`server/.env.example`](server/.env.example)     | MongoDB, JWT, Firebase Admin, Cloudinary, Razorpay, Redis, SMTP |
+| [`client/.env.example`](client/.env.example)     | API URL, Firebase Client, Cloudinary, Razorpay key              |
 
 ---
 
 ## 📜 Scripts
 
-### Backend
+### Server
 
 | Script      | Command              | Description                      |
 | ----------- | -------------------- | -------------------------------- |
@@ -275,7 +275,7 @@ See the detailed `.env.example` files in each directory:
 | Seed Admin  | `npm run seed:admin` | Create initial admin user        |
 | Lint        | `npm run lint`       | Run ESLint                       |
 
-### Frontend
+### Client
 
 | Script      | Command           | Description                      |
 | ----------- | ----------------- | -------------------------------- |
