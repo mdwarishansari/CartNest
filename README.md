@@ -10,7 +10,7 @@
   <em>Empowering local sellers with a modern, secure platform</em>
 </p>
 <p align="center">
-  <a href="https://cartnest-shop.vercel.app/" target="_blank">
+  <a href="https://cartnest-warish.vercel.app" target="_blank">
     <img src="https://img.shields.io/badge/🌐 Live Demo-Visit Now-0A66C2?style=for-the-badge" alt="Live Demo"/>
   </a>
 </p>
