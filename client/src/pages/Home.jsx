@@ -13,6 +13,7 @@ const Home = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [productsTotal, setProductsTotal] = useState(0);
 
   const fetchData = async () => {
     setLoading(true);
@@ -23,6 +24,7 @@ const Home = () => {
         categoryService.getAll(),
       ]);
       setProducts(prodRes.data.products || []);
+      setProductsTotal(prodRes.data.total || 0);
       setCategories(catRes.data.categories || []);
     } catch (err) {
       console.error('Failed to fetch home data:', err);
@@ -66,7 +68,7 @@ const Home = () => {
               className="inline-flex items-center gap-2 px-3 py-1 bg-pure-white border border-ash rounded-3xl text-caption font-graphik text-charcoal mb-6"
             >
               <Sparkles className="w-4 h-4 text-ink-black fill-butter-highlight" />
-              <span className="tracking-wide">Trusted by 100+ Local Sellers</span>
+              <span className="tracking-wide">Direct from Verified Local Sellers</span>
             </motion.div>
 
             <h1 className="text-display sm:text-[42px] lg:text-[52px] font-nantes text-ink-black leading-[1.2] mb-6">
@@ -178,72 +180,7 @@ const Home = () => {
               </motion.div>
             )}
 
-            {/* 2. Seller Rating Card */}
-            {products.length > 0 && products[0].sellerId ? (
-              <motion.div
-                initial={{ opacity: 0, x: 50, y: -40 }}
-                animate={{ opacity: 1, x: 0, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.6 }}
-                whileHover={{ scale: 1.03 }}
-                className="absolute top-10 right-2 w-48 bg-pure-white border border-ash rounded-md p-3.5 z-20"
-                style={{ transform: 'rotate(4deg)' }}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  {products[0].sellerId.logo?.url ? (
-                    <img
-                      src={products[0].sellerId.logo.url}
-                      alt=""
-                      className="w-7 h-7 rounded-full object-cover border border-ash"
-                    />
-                  ) : (
-                    <div className="w-7 h-7 rounded-full bg-ink-black flex items-center justify-center text-pure-white text-[10px] font-bold font-graphik">
-                      {products[0].sellerId.shopName?.charAt(0).toUpperCase() || 'S'}
-                    </div>
-                  )}
-                  <div>
-                    <h4 className="font-graphik text-[11px] font-semibold text-ink-black truncate max-w-[100px]">
-                      {products[0].sellerId.shopName}
-                    </h4>
-                    <p className="text-[9px] text-smoke">Verified Supplier</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 border-t border-ash/60 pt-2">
-                  <span className="text-caption font-bold text-ink-black">5.0</span>
-                  <span className="text-[#e2a000] text-[10px]">★★★★★</span>
-                  <span className="text-[10px] text-smoke">(Verified)</span>
-                </div>
-                <span className="inline-block mt-2 px-2 py-0.5 text-[8px] font-semibold uppercase rounded-3xl bg-[#f2fcf5] text-green-700 border border-green-200">
-                  Verified Seller
-                </span>
-              </motion.div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, x: 50, y: -40 }}
-                animate={{ opacity: 1, x: 0, y: 0 }}
-                transition={{ delay: 0.4, duration: 0.6 }}
-                whileHover={{ scale: 1.03 }}
-                className="absolute top-10 right-2 w-48 bg-pure-white border border-ash rounded-md p-3.5 z-20"
-                style={{ transform: 'rotate(4deg)' }}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-7 h-7 rounded-full bg-ink-black flex items-center justify-center text-pure-white text-xs font-bold font-graphik">S</div>
-                  <div>
-                    <h4 className="font-graphik text-[11px] font-semibold text-ink-black">Studio Clay</h4>
-                    <p className="text-[9px] text-smoke">New Delhi, IN</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 border-t border-ash/60 pt-2">
-                  <span className="text-caption font-bold text-ink-black">4.9</span>
-                  <span className="text-[#e2a000] text-[10px]">★★★★★</span>
-                  <span className="text-[10px] text-smoke">(84)</span>
-                </div>
-                <span className="inline-block mt-2 px-2 py-0.5 text-[8px] font-semibold uppercase rounded-3xl bg-[#f2fcf5] text-green-700 border border-green-200">
-                  Verified Seller
-                </span>
-              </motion.div>
-            )}
-
-            {/* 3. Orders Statistics Card */}
+            {/* 3. Products Statistics Card */}
             <motion.div
               initial={{ opacity: 0, x: -50, y: 40 }}
               animate={{ opacity: 1, x: 0, y: 0 }}
@@ -253,8 +190,12 @@ const Home = () => {
               style={{ transform: 'rotate(-5deg)' }}
             >
               <div className="text-[10px] font-graphik text-smoke uppercase tracking-wider mb-0.5">Marketplace Stats</div>
-              <div className="text-heading font-nantes text-ink-black mb-1">12K+</div>
-              <div className="text-[9px] font-graphik text-smoke leading-tight">Artisan products shipped worldwide this month</div>
+              <div className="text-heading font-nantes text-ink-black mb-1">
+                {productsTotal > 0 ? `${productsTotal}` : '...'}
+              </div>
+              <div className="text-[9px] font-graphik text-smoke leading-tight">
+                Verified artisan product{productsTotal !== 1 ? 's' : ''} currently listed for discovery
+              </div>
             </motion.div>
 
             {/* 4. Category Chips & Secure Payment Tag */}
