@@ -1,28 +1,29 @@
-# 🛒 CartNest
-
 <p align="center">
   <img src="client/public/logo.png" alt="CartNest Logo" width="120" />
 </p>
 
+<h1 align="center">🛒 CartNest</h1>
+
 <p align="center">
-  <strong>CartNest</strong> is a high-performance, production-grade, multi-vendor e-commerce marketplace platform designed to empower local merchants and boutique sellers with a digital storefront. Engineered with a headless, service-oriented architecture, CartNest delivers an editorial, high-aesthetic shopping interface while sustaining secure, high-concurrency transactional processing.
+  <strong>A Full-Stack Multi-Vendor E-Commerce Marketplace</strong>
+  <br />
+  <em>Empowering local sellers with a modern, secure platform</em>
 </p>
 
 <p align="center">
-  <a href="https://github.com/yourusername/CartNest" target="_blank">
-    <img src="https://img.shields.io/github/v/release/yourusername/CartNest?style=flat-square&color=black" alt="Release Version" />
+  <a href="https://cartnest-warish.vercel.app" target="_blank">
+    <img src="https://img.shields.io/badge/🌐 Live Demo-Visit Now-0A66C2?style=for-the-badge" alt="Live Demo"/>
   </a>
-  <a href="https://github.com/yourusername/CartNest/actions" target="_blank">
-    <img src="https://img.shields.io/github/actions/workflow/status/yourusername/CartNest/ci.yml?branch=main&style=flat-square" alt="Build Status" />
-  </a>
-  <img src="https://img.shields.io/badge/License-ISC-blue?style=flat-square" alt="License" />
-  <img src="https://img.shields.io/badge/Node.js-%E2%89%A5%2018-green?style=flat-square&logo=node.js" alt="Node.js Support" />
-  <img src="https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react" alt="React 19" />
-  <img src="https://img.shields.io/badge/Vite-7.0-646CFF?style=flat-square&logo=vite" alt="Vite 7" />
-  <img src="https://img.shields.io/badge/TailwindCSS-4.0-06B6D4?style=flat-square&logo=tailwindcss" alt="Tailwind 4" />
-  <img src="https://img.shields.io/badge/MongoDB-Atlas-47A248?style=flat-square&logo=mongodb" alt="MongoDB Atlas" />
-  <img src="https://img.shields.io/badge/Firebase-Auth-FFCA28?style=flat-square&logo=firebase&logoColor=black" alt="Firebase Auth" />
-  <img src="https://img.shields.io/badge/Razorpay-Gateway-3395FF?style=flat-square&logo=razorpay" alt="Razorpay" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white&style=flat-square" alt="React" />
+  <img src="https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white&style=flat-square" alt="Vite" />
+  <img src="https://img.shields.io/badge/TailwindCSS-4-06B6D4?logo=tailwindcss&logoColor=white&style=flat-square" alt="Tailwind" />
+  <img src="https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white&style=flat-square" alt="Express" />
+  <img src="https://img.shields.io/badge/MongoDB-8-47A248?logo=mongodb&logoColor=white&style=flat-square" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/Firebase-Auth-FFCA28?logo=firebase&logoColor=black&style=flat-square" alt="Firebase" />
+  <img src="https://img.shields.io/badge/Razorpay-Payments-3395FF?logo=razorpay&logoColor=white&style=flat-square" alt="Razorpay" />
 </p>
 
 ---
