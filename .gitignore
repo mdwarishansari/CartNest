@@ -39,6 +39,9 @@ Thumbs.db
 dist/
 build/
 coverage/
+playwright-report/
+test-results/
+lighthouse-report.json
 
 # -----------------
 # Vite

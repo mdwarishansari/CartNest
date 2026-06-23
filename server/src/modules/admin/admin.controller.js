@@ -244,7 +244,7 @@ const deleteUser = asyncHandler(async (req, res) => {
     try {
       const fbUser = await admin.auth().getUserByEmail(user.email);
       await admin.auth().deleteUser(fbUser.uid);
-    } catch (fbErr) {
+    } catch {
       // User may not exist in Firebase, that's ok
     }
   }

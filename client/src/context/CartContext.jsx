@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { cartService } from '../services';
 import { useAuth } from './AuthContext';
+import { getCartCount, getCartSubtotal } from '../utils/cartCalculations';
 import toast from 'react-hot-toast';
 
 const CartContext = createContext(null);
@@ -74,11 +75,8 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const cartCount = cart?.items?.reduce((sum, item) => sum + item.qty, 0) || 0;
-  const cartTotal = cart?.items?.reduce((sum, item) => {
-    const price = item.productId?.price || item.priceAtAdd || 0;
-    return sum + price * item.qty;
-  }, 0) || 0;
+  const cartCount = getCartCount(cart?.items);
+  const cartTotal = getCartSubtotal(cart?.items);
 
   return (
     <CartContext.Provider

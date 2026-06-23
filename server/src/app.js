@@ -21,7 +21,22 @@ const adminRoutes = require("./modules/admin/admin.routes");
 const app = express();
 
 // ─── Security ───
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+        imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
+        connectSrc: ["'self'", process.env.FRONTEND_URL, process.env.BACKEND_URL].filter(Boolean),
+      },
+    },
+  }),
+);
 
 // ─── CORS ───
 const corsOrigin =

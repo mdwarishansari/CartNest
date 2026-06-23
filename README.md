@@ -252,6 +252,161 @@ CartNest satisfies critical staging metrics before cloud deployment:
 
 ---
 
+# Quality Assurance Report
+
+> Generated from measured build, lint, test, coverage, and Lighthouse runs on **23 Jun 2026**.
+
+## Build Verification
+
+| Check | Status |
+|-------|--------|
+| Client build (`npm run build`) | ✅ Pass |
+| Client lint (`npm run lint`) | ✅ Pass (6 warnings, 0 errors) |
+| Server lint (`npm run lint`) | ✅ Pass |
+| Type check | N/A — JavaScript project (no TypeScript compiler configured) |
+
+## Testing Summary
+
+| Metric | Count |
+|--------|-------|
+| Total test files | 22 |
+| Total unit tests | 32 |
+| Total integration tests | 14 |
+| Total E2E tests | 7 |
+| **Total tests executed** | **53** |
+
+All 53 tests passed in the latest run.
+
+## Coverage Breakdown
+
+### Server (`server/` — utils + authorize middleware)
+
+| Metric | Coverage |
+|--------|----------|
+| Statements | 95.65% |
+| Functions | 94.73% |
+| Lines | 97.11% |
+| Branches | 69.44% |
+
+### Client (`client/src/utils/`)
+
+| Metric | Coverage |
+|--------|----------|
+| Statements | 85.29% |
+| Functions | 100% |
+| Lines | 100% |
+| Branches | 71.73% |
+
+## Security Review
+
+### Findings
+
+- JWT sessions stored in HTTP-only cookies (good baseline)
+- Input validation via `express-validator` on auth, cart, checkout, and admin routes
+- Razorpay payment signatures verified with HMAC helper before order finalization
+- Helmet enabled with explicit CSP directives for scripts, styles, fonts, images, and API origins
+- Firebase Admin token verification required for session creation
+- Role-based access enforced via `authenticate` + `authorize` middleware
+
+### Fixes Applied
+
+- Extracted `verifyRazorpaySignature()` into a dedicated, test-covered utility
+- Hardened Helmet configuration with Content Security Policy
+- Added server-side cart/order/discount calculation utilities with unit test coverage
+- Removed unused imports and resolved ESLint issues in auth/admin/order modules
+
+## Accessibility Review
+
+### Findings
+
+- Skip-to-content link added for keyboard users
+- Semantic landmarks (`main`, headings) present on primary pages
+- Some dashboard forms still need broader ARIA labeling
+- Lighthouse accessibility score below the 90 target
+
+### Score
+
+**79 / 100** (Lighthouse, production preview build)
+
+## SEO Review
+
+### Findings
+
+- Added Open Graph, Twitter Card, canonical, robots.txt, sitemap.xml, and JSON-LD structured data
+- Improved page metadata in `client/index.html`
+
+### Score
+
+**100 / 100** (Lighthouse, production preview build)
+
+## Lighthouse Results
+
+Measured against `http://127.0.0.1:4173` (Vite production preview):
+
+| Category | Score |
+|----------|-------|
+| Performance | 47 |
+| Accessibility | 79 |
+| Best Practices | 96 |
+| SEO | 100 |
+
+Raw report: `client/lighthouse-report.json`
+
+## Performance Improvements
+
+- Added Vite manual chunk splitting for vendor, charts, and motion bundles
+- Main bundle reduced from ~736 kB to ~565 kB after chunking
+- Image delivery remains on Cloudinary CDN (no backend bottleneck)
+
+## Files Modified
+
+- Testing stack: Jest, Supertest, MongoDB Memory Server, Playwright, coverage configs
+- Utilities: cart/order/discount/role/payment helpers (server + client)
+- Security: Helmet CSP, Razorpay signature helper
+- SEO: `index.html`, `robots.txt`, `sitemap.xml`
+- Accessibility: skip link, screen-reader utility classes
+- Performance: Vite chunk splitting
+- Documentation: `TESTING.md`, this QA report
+
+## Issues Fixed
+
+- ESLint failures (unused imports, React plugin JSX tracking, ProductCard effect warning)
+- Missing professional test suite
+- Missing coverage reporting
+- Missing E2E coverage for public/protected routes
+- Missing SEO artifacts and structured metadata
+
+## Remaining Issues
+
+- Lighthouse performance score (47) blocked by large JS bundles and third-party font loading
+- Accessibility score (79) below 90 target — dashboard forms and focus states need deeper audit
+- Full authenticated E2E flows (Firebase login, Razorpay checkout) require test credentials and are not automated
+- Branch coverage on server utils remains below 70% due to defensive guard paths
+
+## Production Readiness Score
+
+**72 / 100**
+
+| Area | Weight | Score |
+|------|--------|-------|
+| Build & lint | 15 | 14 |
+| Automated tests | 25 | 23 |
+| Coverage | 15 | 13 |
+| Security | 15 | 13 |
+| Accessibility | 10 | 7 |
+| SEO | 10 | 10 |
+| Performance | 10 | 4 |
+
+## Final Verdict
+
+### NEEDS WORK
+
+CartNest now has a professional automated testing foundation, strong SEO, and improved security posture. Before calling it production-ready, address frontend performance (code-splitting dashboards, font strategy) and raise accessibility above 90.
+
+See [TESTING.md](./TESTING.md) for commands and architecture details.
+
+---
+
 <p align="center">
   Built with ❤️ by <strong>Md Warish Ansari</strong>
 </p>

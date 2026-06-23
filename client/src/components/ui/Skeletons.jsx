@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 
 // Helper line skeleton
 export const SkeletonLine = ({ width = '100%', height = '16px', className = '' }) => (

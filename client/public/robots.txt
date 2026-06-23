@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cartnest-warish.vercel.app/sitemap.xml

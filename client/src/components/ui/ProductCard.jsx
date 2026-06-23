@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ShoppingCart, Eye } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
+import { calculateDiscountPercent } from '../../utils/discountCalculations';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
@@ -11,22 +12,24 @@ const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const showCartButton = !isSeller && !isAdmin && !isVerifier;
   const allImages = product.images?.length > 0 ? product.images : [{ url: 'https://placehold.co/300x300/e2e8f0/94a3b8?text=Product' }];
-  const discount = product.mrp && product.mrp > product.price ? Math.round(((product.mrp - product.price) / product.mrp) * 100) : 0;
+  const discount = calculateDiscountPercent(product.mrp, product.price);
 
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const intervalRef = useRef(null);
+  const displayIdx = isHovering ? currentIdx : 0;
 
   // Cycle through images on hover
   useEffect(() => {
-    if (isHovering && allImages.length > 1) {
-      intervalRef.current = setInterval(() => {
-        setCurrentIdx((prev) => (prev + 1) % allImages.length);
-      }, 800);
-    } else {
+    if (!isHovering || allImages.length <= 1) {
       clearInterval(intervalRef.current);
-      setCurrentIdx(0);
+      return undefined;
     }
+
+    intervalRef.current = setInterval(() => {
+      setCurrentIdx((prev) => (prev + 1) % allImages.length);
+    }, 800);
+
     return () => clearInterval(intervalRef.current);
   }, [isHovering, allImages.length]);
 
@@ -43,7 +46,7 @@ const ProductCard = ({ product }) => {
       {/* Image */}
       <Link to={`/product/${product.slug}`} className="block relative overflow-hidden aspect-square bg-cream-paper border-b border-ash/40">
         <img
-          src={allImages[currentIdx]?.url}
+          src={allImages[displayIdx]?.url}
           alt={product.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
           style={{ opacity: 1 }}
@@ -70,7 +73,7 @@ const ProductCard = ({ product }) => {
         {allImages.length > 1 && (
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             {allImages.map((_, i) => (
-              <span key={i} className={`w-1 h-1 rounded-full transition-all duration-300 ${i === currentIdx ? 'bg-ink-black w-2' : 'bg-ash'}`} />
+              <span key={i} className={`w-1 h-1 rounded-full transition-all duration-300 ${i === displayIdx ? 'bg-ink-black w-2' : 'bg-ash'}`} />
             ))}
           </div>
         )}

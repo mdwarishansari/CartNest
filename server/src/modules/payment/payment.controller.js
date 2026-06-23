@@ -4,6 +4,7 @@ const Product = require("../product/product.model");
 const SellerProfile = require("../seller/sellerProfile.model");
 const asyncHandler = require("../../utils/asyncHandler");
 const ApiError = require("../../utils/ApiError");
+const { verifyRazorpaySignature } = require("../../utils/paymentSecurity");
 
 /**
  * POST /api/payments/verify
@@ -27,13 +28,14 @@ const verifyPayment = asyncHandler(async (req, res) => {
   }
 
   // Verify signature
-  const body = razorpay_order_id + "|" + razorpay_payment_id;
-  const expectedSignature = crypto
-    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-    .update(body)
-    .digest("hex");
+  const isValidSignature = verifyRazorpaySignature({
+    orderId: razorpay_order_id,
+    paymentId: razorpay_payment_id,
+    signature: razorpay_signature,
+    secret: process.env.RAZORPAY_KEY_SECRET,
+  });
 
-  if (expectedSignature !== razorpay_signature) {
+  if (!isValidSignature) {
     // Mark payment as failed
     await Order.findByIdAndUpdate(orderId, { paymentStatus: "failed" });
     throw ApiError.badRequest(

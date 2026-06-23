@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const Order = require("./order.model");
 const Cart = require("../cart/cart.model");
 const Product = require("../product/product.model");
-const SellerProfile = require("../seller/sellerProfile.model");
 const { getRazorpay } = require("../../config/razorpay");
 const asyncHandler = require("../../utils/asyncHandler");
 const ApiError = require("../../utils/ApiError");

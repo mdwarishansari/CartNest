@@ -19,7 +19,7 @@ const createSession = asyncHandler(async (req, res) => {
   let decodedToken;
   try {
     decodedToken = await admin.auth().verifyIdToken(idToken);
-  } catch (error) {
+  } catch {
     throw ApiError.unauthorized("Invalid Firebase token");
   }
 

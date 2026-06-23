@@ -56,7 +56,7 @@ const Login = () => {
       await sendEmailVerification(fbUser);
       await auth.signOut();
       toast.success('Verification email sent! Check your inbox.');
-    } catch (err) {
+    } catch {
       toast.error('Failed to resend. Try again later.');
     } finally {
       setResending(false);
